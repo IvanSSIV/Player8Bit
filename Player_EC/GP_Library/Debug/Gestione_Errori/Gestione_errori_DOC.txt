@@ -1,0 +1,3 @@
+Gestione_errori
+
+Questo è un modulo ancora in fase di progettazione, che mira alla creazione di funzioni di debug da remoto tramite messaggi inviati al server.

@@ -1,0 +1,16 @@
+  In questo folder e' contenuto il codice specifico di un player EC
+   - IO_mapping.h
+     mappatura I/O specifica player EC
+
+   - sottocartella Erog
+     codice gestione erogazione tappi
+   
+   - sottocartella Motor
+     codice gestione motore specifica player EC
+
+   - sottocartella Command
+     gestione comandi ESC specifici
+
+   - sottocartella Special_func
+     funzioni speciali per player_EC
+     - conteggio tappi

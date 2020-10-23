@@ -1,0 +1,49 @@
+My_Library/Connessione
+
+I moduli di libreria presenti all'interno della sezione "connessione" si occupano di creare una struttura di riferimento per la gestione
+della comunicazione con il server.
+Il primo modulo, Ethernet_Template, fornisce lo scheletrato necessario alle operazioni di basso livello che consentono la connessione
+vera e propria alla rete, comprese le funzioni necessarie alla connessione del dispositivo utilizzando il protocollo DHCP.
+
+Il secondo modulo, PLC_server_interface, crea un'interfaccia che il PLC utilizza per inviare richieste di servizi al gestore del server.
+Queste funzioni vengono quindi utilizzate per stabilire se il gestore dei servizi per il server sia pronto a gestire una richiesta
+da parte del modulo PLC e, nel caso contrario, a gestire i tentativi di richiesta successivi.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+//////////                   Ethernet_Template                       //////////
+
+-void Ethernet_init(void):
+ Inizializza la connessione Ethernet in DHCP o con indirizzo IP statico, prendendo
+ i parametri di configurazione della connessione dal file CONFIG.DAT
+ 
+-void Ethernet_mantain_lease(void):
+ Mantiene attiva la connessione Ethernet per evitare problemi dovuti all'assegnazione
+ degli indirizzi IP dal DHCP server
+ 
+//////////                  PLC_server_interface                     //////////
+
+-void SRV_service_request_start(uint8_t service_ID):
+ Inizializza una richiesta al gestore del server per l'invio di un messaggio,
+ con o senza risposta
+ 
+-event_hand_retval SRV_service_request_hand(void):
+ Gestisce la vera e propria procedura di invio della richiesta al gestore del server,
+ per evitare di intasare il gestore con richieste continue durante l'esecuzione di una
+ di queste
+ Restituisce un typedef con lo stato di esecuzione del servizio richiesto, che vale:
+    EVENT_HAND_STARTING      // Gestore non ancora inizializzato
+    EVENT_HAND_READY         // gestore pronto a ricevere comandi
+    EVENT_HAND_EXEC          // gestore in esecuzione di un comando
+    EVENT_HAND_DONE          // comando eseguito correttamente
+    EVENT_HAND_ERROR         // errore nell'esecuzione del comando
+    EVENT_HAND_FAIL          // errore fatale (non recuperabile)
+In condizioni di riposo, questa funzione dovrà restituire EVENT_HAND_READY, a indicare la
+disponibilità a ricevere un comando. Appena ricevuto un comando restituisce EVENT_HAND_EXEC
+per tutto il tempo della durata dell'operazione. Al termine dell'operazione, se tutto si è
+svolto correttamente restituirà EVENT_HAND_DONE. La macchina a stati di gestione di questa
+attività, al termine di un comando, rimane in EVENT_HAND_DONE per un ritardo atto a consentire
+un delta di tempo al server fra un comando e l'altro. Trascorso questo tempo, il gestore torna
+automaticamente in EVENT_HAND_READY.

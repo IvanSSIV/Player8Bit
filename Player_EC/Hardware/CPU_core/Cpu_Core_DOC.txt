@@ -1,0 +1,25 @@
+CPU_Core
+
+Questo modulo nasce per contenere tutte le funzioni relative al core della CPU, ovvero tutte 
+quelle funzioni che si basano sulla struttura essenziale del microcontrollore.
+Allo stato attuale, l'unica funzione inclusa in questo modulo è l'API che restituisce 
+il valore ottenuto chiamando la funzione "millis()" di Arduino, ovvero i millisecondi 
+trascorsi dall'avvio del microcontrollore.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void basetempi_RTOS_init(void):
+ Inizializza le variabili utilizzate per la base tempi del main chiamando l'API
+ RTOS_get_tick_1ms
+ 
+-uint32_t RTOS_get_tick_1ms(void):
+ Restituisce il valore della funzione "millis()" di Arduino
+ 
+-void basetempi_RTOS_main(void):
+ Gestisce i flag per le basi tempi, in modo da stabilire l'abilitazione all'esecuzione delle
+ funzioni in base al tempo trascorso dall'ultima esecuzione
+ 
+-void basetempi_RTOS_clear_flg(void):
+ Azzera i flag della base tempi, e va chiamata alla fine del main di applicazione

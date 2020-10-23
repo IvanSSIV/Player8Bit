@@ -1,0 +1,9 @@
+In questo folder sono contenuti i file header specifici delle applicazione LANZI
+- Lanzi_def.h
+  Header contenente la definizione dei modelli di player e piattaforme hw
+
+- player_def.h
+  Moduli con definizioni comuni ai player Lanzi
+  leggere e caricare in memoria il config da LAN,SD,o EEPROM  
+
+  

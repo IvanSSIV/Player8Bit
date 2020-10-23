@@ -1,0 +1,69 @@
+Appl_Erog
+
+I moduli "appl_badge" e "appl_erog" concorrono nel funzionamento del riconoscimento
+dell'utente tramite badge, nel recupero delle informazioni necessarie a garantire
+l'autorizzazione ad effettuare operazioni sulla macchina e al controllo delle
+operazioni stesse.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+//////////                       appl_badge                          //////////
+
+-BOOL badge_present(void):
+ Restituisce TRUE se è presente un badge letto, che ha passato le verifiche
+ preliminari di congruità
+ 
+-void badge_get_last_reading(char* read_badge, uint8_t size):
+ Legge il contenuto dell'ultimo badge passato
+ 
+-void badge_init(void):
+ Inizializza la macchina a stati di tipo complesso per la gestione ad alto
+ livello della lettura del badge; contiene l'inizializzazione a basso livello
+ della Serial2 utilizzata per la lettura.
+ 
+-void badge_ena_read(void):
+ Abilita la lettura del badge dal main di applicazione
+ 
+-void badge_dis_read(void):
+ Disabilita la lettura del badge dal main di applicazione
+ 
+-void badge_hand(void):
+ Macchina a stati principale per la gestione della lettura del badge
+ 
+-static void badge_print(void):
+ Stampa il badge letto come sequenza di caratteri ASCII e l'equivalente
+ in esadecimale
+ 
+-static BOOL badge_verify(char* badge):
+ Verifiche di congruità del badge letto
+ 
+-void request_auth_check(void):
+ Segnala all' "appl_badge" che il badge che verrà letto sarà quello di
+ un autorizzatore
+ 
+-static void badge_concat(char *vect,uint8_t size,char rx_chr):
+ Concatena nel vettore "vect" il badge letto, eliminando i caratteri
+ di controllo
+ 
+-static void badge_concat_all(char* vect, uint8_t size, char rx_chr):
+ Concatena tutti i caratteri del badge all'interno del vettore "vect",
+ senza eliminare i caratteri di controllo
+ 
+-void badge_clear(char* vect, uint8_t size):
+ Pulisce il vettore per il salvataggio del badge
+
+//////////                       appl_erog                           //////////
+
+-void erog_init(void):
+ Inizializza la macchina a stati di tipo complesso per la gestione dell'erogazione
+ 
+-void erog_hand(void):
+ Gestione ad alto livello dell'erogazione all'interno del main di applicazione
+ 
+-void erog_event_send(uint8_t EROG_EV_ID):
+ Gestore dell'invio di eventi alla macchina di gestione erogazione
+ 
+-static char* erog_event_to_str(uint8_t event_ID):
+ Assegna all'evento passato come parametro la stringa di Program Memory corrispondente

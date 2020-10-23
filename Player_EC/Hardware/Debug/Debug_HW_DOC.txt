@@ -1,0 +1,45 @@
+Debug_HW
+
+Questo modulo contiene i driver a basso livello per l'attuazione di 4 test 
+point hardware.
+I test point sono stati ricavati da piazzole già presenti sulla scheda, 
+quindi direttamente collegate a pin fisici del microcontrollore.
+L'utilizzo di questi test point diretti anzichè la uscite già presenti 
+sulla piedinatura della scheda permette un'analisi più
+accurata dell'esecuzione delle funzioni da parte del microcontrollore: 
+le uscite disponibili, infatti, sono controllate da dei MOSFET.
+Questi MOSFET hanno una curva di conduzione che ritarda la ricezione del 
+segnale da parte di un oscilloscopio, compromettendo quindi la
+misurazione dei tempi di esecuzione del microcontrollore.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void dbg_HW_init(void):
+ Inizializza i test point hardware con primitive HW dependent a basso livello,
+ manipolando i registri DDR delle porte del microcontrollore
+ 
+-void dbg_HW_TP0_ON(void):
+ Attiva il TP0; impiega circa 480ns
+ 
+-void dbg_HW_TP0_OFF(void):
+ Disattiva il TP0; impiega circa 480ns
+ 
+ -void dbg_HW_TP1_ON(void):
+ Attiva il TP1; impiega circa 480ns
+ 
+-void dbg_HW_TP1_OFF(void):
+ Disattiva il TP1; impiega circa 480ns
+ 
+ -void dbg_HW_TP2_ON(void):
+ Attiva il TP2; impiega circa 480ns
+ 
+-void dbg_HW_TP2_OFF(void):
+ Disattiva il TP2; impiega circa 480ns
+ 
+ -void dbg_HW_TP3_ON(void):
+ Attiva il TP3; impiega circa 480ns
+ 
+-void dbg_HW_TP3_OFF(void):
+ Disattiva il TP3; impiega circa 480ns

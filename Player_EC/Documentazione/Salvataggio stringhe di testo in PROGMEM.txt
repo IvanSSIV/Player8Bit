@@ -1,0 +1,54 @@
+Per salvare array di stringhe in PROGMEM (nell'ambiente AVR), si dichiara un puntatore di tipo const char * const, con la
+keyword PROGMEM che forza la memorizzazione del vettore in flash anzichè in RAM.
+N.B.: Gli elementi del vettore sono a loro volta con l'attributo PROGMEM per forzarne l'allocazione in memoria Flash.
+
+// Stringhe in program memory per stampa di debug
+const char str_log_st_init[] PROGMEM                     = { "ST_LOGIC_INIT" };
+const char str_log_st_main[] PROGMEM                     = { "ST_LOGIC_MAIN" };
+const char str_log_st_send_offline[] PROGMEM             = { "ST_LOGIC_SEND_OFFLINE" };
+const char str_log_st_badge[] PROGMEM                    = { "ST_LOGIC_BADGE" };
+const char str_log_st_check_lan[] PROGMEM                = { "ST_LOGIC_CHECK_LAN" };
+
+
+// Vettore di program memory per i nomi degli stati 
+const char* const state_name[] PROGMEM = {
+	str_log_st_init,
+	str_log_st_main,
+	str_log_st_send_offline,
+	str_log_st_badge,
+	str_log_st_check_lan,
+};
+
+A livello di utilizzo, per semplificare il passaggio dei parametri, si utilizza per l'indirizzo dell'array di stringhe un puntatore void.
+Il puntatore void accetta qualunque tipo di parametro. A livello di chiamata di funzione, si fa un cast "void *" del vettore sopra citato.
+La funzione accetta un parametro di tipo "void". All'interno della funzione, si effettua un casting inverso da void al tipo di dato originale.
+Nella fattispecie dell'architettura AVR, per accedere ad uno specifico puntatore del vettore, è necessario utilizzare la funzione
+pgm_read_word()
+
+		  char** loc_erog_state_name;                                             // Puntatore al dato originale; N.B.: a livello di funzione, non serve la dichiarazione const
+
+          loc_erog_state_name = (char**)fsm->state_name;                          // Effettua il casting da void a puntatore originale
+          state_message = (char*)pgm_read_word(&loc_erog_state_name[state]);      // Usa la pgm_read_word per recuperare il puntatore al messaggio dalla memoria flash
+		  
+		  
+		  
+cache: memoria RAM che si interpone tra il processore e la flash per consentire al processore di leggere a tempo zero i dati dalla flash, che in condizioni normali
+non sarebbe possibile. si abbina ad un cache controller che provede a fare letture in modo trasparente.
+
+La flash ha bisogno di un determinato tempo di accesso; al primo byte, il cache controller prenderà una porzione e la inserirà nella cache; dal byte successivo, la lettura
+sarà a tempo zero, perchè i dati necessari saranno già nella memoria cache. Affinchè un microprocessore possa girare a velocità piena, è necessario che ci siano o un cache controller
+o che il firmware sia scritto tutto in flash.
+
+La RAM è leggibile e scrivibile sempre a tempo quasi zero e ha un numero di cicli di scrittura infiniti; 
+per micro molto veloci (Es. Pentium, 1 GHz) è necessaria una cache di secondo livello, integrata direttamente
+dentro al micro. Per un micro come AVR non ha tempi di attesa. La flash ha tempi di lettura zero (sempre per un micro relativamente "lento"), ma non può essere scritta in runtime
+e richiede la cancellazione di interi settori (no accesso al byte).
+La flash è divisa in settori; per scrivere un settore bisogna cancellarlo completamente e riscriverlo, seguendo opportune temporizzazioni tipicamente mediante dispositivi
+esterni(ISP).
+
+Bootloader: Programma che risiede nella zona dei vettori di restart; riceve tramite la seriale il codice oggetto, cancella un settore alla volta e scrive
+il nuovo programma.
+EEPROM (electronically erasable programmable read only memory): accessibile a tempo zero, programmabile e cancellabile a blocchi grandi un byte. Serve per salvare dei setup
+in cui sia necessario cambiare un singolo dato.
+Sia la EEPROM che la flash hanno un numero di letture infinito, ma un numero di scritture piuttosto "limitato"(10000 - 1000000).
+Esiste una memoria particolare, FRAM (ferroelectrical random access memory) che unisce i vantaggi della RAM e della flash: è una RAM che non perde i dati se disalimentata.

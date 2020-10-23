@@ -1,0 +1,27 @@
+Gestione_LCD
+
+Questo modulo costituisce i driver hardware per il controllo del display LCD 20x4.
+In questo modulo, quindi, sono contenute le funzioni a basso livello della libreria "LiquidCrystal" di Arduino, che permettono
+il controllo della stampa sul display LCD tramite la sua inizializzazione definendo i pin per il controllo.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void LCD_init(void)
+ Inizializza il display 4x20 tramite le librerie di Arduino
+ 
+-void LCD_write_line1(char *message):
+ Scrive un messaggio di massimo 20 caratteri sulla prima riga del display
+
+-void LCD_write_line2(char *message)
+Scrive un messaggio di massimo 20 caratteri sulla seconda riga del display
+
+-void LCD_write_line3(char *message)
+Scrive un messaggio di massimo 20 caratteri sulla terza riga del display
+
+-void LCD_write_line4(char *message)
+Scrive un messaggio di massimo 20 caratteri sulla quarta riga del display
+
+-static void my_LCD_printXY(char* message, uint8_t x, uint8_t y):
+ Scrive un messaggio sull'LCD alla posizione (x, y)

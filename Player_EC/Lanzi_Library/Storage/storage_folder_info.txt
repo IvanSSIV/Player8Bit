@@ -1,0 +1,8 @@
+In questo folder sono inseriti i moduli per la memorizzazione locale
+
+- storage_def.h
+  Definizioni per libreria storage
+
+- storage_main.ccp , storage_main.h
+  Questo modulo contiene una FSM che si occupa di centralizzare e gestire
+  i servizi di accesso al supporto di memorizzione locale (SD)

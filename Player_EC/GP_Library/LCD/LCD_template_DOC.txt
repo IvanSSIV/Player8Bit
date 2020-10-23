@@ -1,0 +1,25 @@
+My_Library/LCD_template
+
+Questo template viene utilizzato per la gestione ad alto livello della stampa sull'LCD.
+Indipendentemente dall'hardware utilizzato, questo modulo viene implementato nella seguente modalità:
+
+	-Una funzione gestisce le richieste di stampa sull'LCD da parte dei moduli esterni
+	-La gestione principale dell'LCD "scoda" le richieste ed effettua le stampe
+	
+In questo modo, non è il codice applicazione a gestire direttamente il modulo dell'LCD, ma interviene un gestore a se stante
+per evitare sovrapposizioni di richieste.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void LCD_hand(void):
+ Gestore delle richieste all'LCD che si occupa di stampare sul display i messaggi che gli vengono inviati
+ 
+-void LCD_send_event(uint8_t event, char *message):
+ Funzione richiamata dalle FSM ad alto livello che invia una richiesta di stampa all'handler dell'LCD
+ 
+-void LCD_line1_update(char *buffer):
+ Aggiorna le informazioni della prima riga dell'LCD in modo asincrono; viene richiamata dal main della gestione
+ RTC ad ogni variazione di secondo per aggiornare l'orario indicato
+ 

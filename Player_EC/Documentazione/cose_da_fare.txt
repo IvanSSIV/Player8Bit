@@ -1,0 +1,12 @@
+In data 27-09-2020
+- la "LAN_connection" contiene un delay 100ms 
+  Va riscritta in modo non bloccante
+- sistemare la "Serial_Command"
+  Organizzarla in modo il piu' possibile generico
+- la "server_open" in caso di retry e' sospensiva
+  contine un delay 100ms
+- inserire nelle API di anag e config i controlli di 
+  SD presente e file presente
+- creare una API per astrarre la lettura dalla SD dalle 
+  librerie di Arduino da inserire in GP_library e Hardware
+- la gestione dell'LCD in "GP_library\LCD_template" e' da completare

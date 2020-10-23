@@ -1,0 +1,84 @@
+Premessa
+--------
+Nell'attivita di sistemazione del FW dell'EC , che sicuramente e' più
+semplice di altri , (esempio XL) mi sono prefissato i seguenti obbiettivi :
+- Analizzare le varie fasi dell'attivita e cercare di raccogliere
+  a "fattor comune" la maggior parte del codice.
+- A livello di logica principale mettere in piedi una configurazione
+  completa con parti che possono o meno essere abilitate in una specifica
+  applicazione.
+- Separare il più possibile lo strato "applicazione" dallo strato "libreria".
+  Lo strato "applicazione" e' quello da testare sul campo in condizioni 
+  non sempre ottimali per cui deve essere il piu' semplice possibile anche
+  a costo di rinunciare a costrutti informaticamente più raffinati.
+  Lo strato "libreria" (almeno nelle intenzioni) viene sviluppato e testato
+  in sede e modificato solo per nuove implementazioni.
+- Punto fondamentale del progetto cotruire parallelamente al codice una
+  buona documentazione di spiegazione a corredo , cosa che al momento della
+  scrittura puo' sembrare superfluo e dispersivo , ma che a distanza di tempo
+  fa la differenza in caso si debba tornare sull'argomento.
+
+Lo scopo finale va al di la di rimettere in "pulito" il FW del player EC ma 
+andare a creare un "template" comune a tutte le macchine.
+Sono convinto che il proliferare di versioni di FW ottenute per copia della
+copia diventi assolutamente oneroso e quasi ingestibile.
+
+Punto cardine di questa attivita e' la creazione delle LANZI_library.
+
+
+ Lanzi library
+---------------
+Le "Lanzi library" sono concettualmente un contenitore di moduli di codice
+dove vengono raggruppate quelle parti di codice comuni alle varie applicazioni.
+Sono attività specifiche del mondo LANZI ma che sono comuni a tutti i player 
+che sono al momento implementati.
+Per citare un esempio la lettura del config e' una attività che e' assolutamente
+(al 90%) comune a tutte le macchine. Non sono (per ora) delle librie nel 
+senso formale della parola , ma svolgono un ruolo assolutamente assimilabile.
+Penso non serva rammentare i vantaggi di una tale soluzione in quanto la
+manutenzione e l'aggiornamento della libreria si estende automaticamente a
+tutte le applicazioni che ne fanno uso.
+
+Le "Lanzi library" si occupano di :
+- gestire il config
+- gestire l'anagrafica
+- gestire la comunicazione con il server
+- gestire il badge
+- gestire le attivita OFFline
+- gestire le movientazioni con motore+encoder
+
+Tra le varie parte quelle piu importanti sono sicuramente la gestione del server, 
+del config e dell'anagrafica.
+Sempre nell'ottica di mantenere il più possibile uguale il codice , pur in presenza
+di specifiche particolarita' , a livello di applicazione e' stato introdotto il
+concetto di "Machine_ID" cioe' un identificatore del modello che 
+consente di modicare alcuni comportamenti del FE W (ad esempio cambiare i
+campi dei dati del config pur nel contesto di una gestione comune).
+
+
+ Obbiettivo atteso
+-------------------
+Il punto di arrivo di questa attività e' quello di creare una architettura modulare e 
+flessibile creando dei livelli di astrazione delle attivita . Si e' cercato come
+regola della programmazione modulare di tenere il più possibile dati "privati" limitando
+al massimo quelli globali. Tutta l'achitettura delle nuove macchine e' basata 
+fortemente sull'uso dell Finited State Machine per avere sempre sistemi reattivi,
+con la suddivisione dei compiti fra varie FSM (vedi organizzazione_FSM_player.txt).
+
+Altro obbiettivo (nei limiti dell'architettura a 8 bit) e' di creare codice 
+plataform indipendent separando li strati Applicazione,Lanzi library,Hardware.
+In questa ottica pur utilizzando per comodità le librerie di Arduino tutta
+l'applicazione e' pensata per essere facilmente spostata su qualunque
+piattaforma anche completamente diversa da Arduino.
+
+Ultimo e non meno importatnte e' quello di separare il livello di applicazione
+del livello libreria . Questo consente di avere un livello applicazione "semplice"
+con chiamate a librerie che nascondono la complessita intrinseca delle
+attivita sottostanti.
+
+ Ulteriori sviluppi
+-------------------
+L'archiettura complessiva del sistema organizzata in moduli separati che
+operano come una specie di server locale e'apertà ad una architettura
+ancora più evoluta in cui determinati compiti vengono "delegati" a 
+dispositivi hardware esterni.

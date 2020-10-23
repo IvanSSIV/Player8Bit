@@ -1,0 +1,97 @@
+               ----------------------------------------
+                 regole progetti FW-Lanzi  19-09-2020
+               ----------------------------------------
+
+Per realizzare un progetto FW conforme alle regole interne per le 
+applicazione embedded devono essere usate le seguenti regole . 
+Un qualunque progetto in estrema sintesi , e' costituto da una cartella
+dell'applicazione che si appoggia a tre "macro-librerie" di supporto 
+oltre a quelle di sistema (C + Arduino.)
+Le tre librerie necessarie sono :
+- Hardware
+- Lanzi_library
+- GP_library
+
+organizzazione cartelle
+-----------------------
+  Al top level , ovvero nella cartella di progetto, devono 
+  essere essere presenti le seguenti file/cartelle
+  - nome_applicazione.h
+  - nome_applicazione.ino
+  - project_def.h
+  - debug_opzion.h
+  - Application_Code
+  - Hardware
+  - Lanzi_library
+  - GP_libray
+
+
+descrizione file/cartelle progetto
+----------------------------------
+- nome_applicazione.h
+  E' una file include che ragguppa tutti gli include necessari all'applicazione
+  e facilita la scrittura dei moduli dell'applicazione. Infatti includendo 
+  questo file si include automaticamente tutto quello che serve 
+  nell'applicazione evitando fastidiosi errori del compilatore.
+
+- nome_applicazione.ino
+  E' fondamentalmente una esisgenza di ambiente Visual_Studio/Visual_Micro per
+  il mondo Arduino . E' un guscio vuoto con la Init e la Loop di Arduino che
+  si limitano a chiamare 
+
+- project_def.h
+  Raggruppa una serie di direttive #define che permettono di configurare
+  diversi aspetti del progetto , compresi l'archiettura hardware ultilizzata
+
+- debug_opzion.h
+  Contiene una serie di direttive #define per abilitare/disabilitare specifiche
+  attivita' di debug all'interno dell'applicazione e/o libreria.
+
+- cartella "Application_Code"
+  contiene le cartelle e file con il codice specifiche di applicazione e eventuali
+  "personalizzazioni" di driver o librerie che si rendano necessarie.
+
+- cartella "Hardware"
+  Contiene i driver fisici a basso livello dei vari dispositivi specifici per
+  la scheda usata . E' suddivisa in sottocartelle per i vari dispositivi
+  (CPU,I/O,seriali,EEPROM).
+  Esiste una libreria "hardware" per ogni scheda usata . Attualmente ci sono
+  una libreria per la 8bit con processore Atmega2560 e una per la 32bit con
+  processore SAM3X8.
+
+- cartella "Lanzi_library"
+  Contiene le libreria con il codice specifico delle applicazioni LANZI ma 
+  comune alle varie applicazioni . Sono un esempio di tale libreria il 
+  codice per gestire il server , il config , e l'anagrafica, ecc.
+  Questa libreria e' strutturata per essere application e plataform
+  indipent. Contiene infatti solo codice ad alto livello.
+
+- cartella "GP_library"
+  Contiene delle librerie "general purpose" cioe' di uso generale indipendenti
+  dall'applicazione . E' tutto codice indipendente dall'hardware e 
+  dall'applicazioe
+  Comprende diverse sottocartelle :
+  - EEPROM,LCD,RTC,SD,ETHERNET
+    Contengono la parte ad alto livello per gestire i rispettivi dispositivi
+    e si appoggiano al driver specifico presente nella librerie "hardware"
+  - FSM
+    Contengono definizioni e utility per la gestione dell FSM.
+  - PLC
+    Contiene definizioni per implementare applicazioni PLC like
+  - Utility
+    Contiene utility varie
+  - My_Include
+    Contiene include generici personalizzati
+  - My_Debug
+    Contine il codice delle utility di supporto per il debug personalizzato
+
+- cartella "Documentazione"
+  Contiene tutta la documentazione di corredo di carattere generale legata 
+  all'applicazione (testi,diagrammi di flusso,ecc). 
+  In aggiunta al contenuto della cartella "Documentazione" ogni cartella 
+  del progetto contiene un file di testo con  con un piccola descrizione 
+  del contenuto della cartella in oggetto.
+
+    
+
+

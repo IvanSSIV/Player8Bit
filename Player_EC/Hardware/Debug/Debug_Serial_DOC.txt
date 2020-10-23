@@ -1,0 +1,24 @@
+Debug_Serial
+
+Questo modulo contiene tutte le funzioni di stampa di debug sulla porta seriale 
+Serial dell'AtMega2560.
+Queste funzioni si occupano della lettura e scrittura su seriale a basso livello.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void debug_serial_init(void):
+ Inizializzazione con l'API di Arduino "begin" della seriale per il debug, a baud rate 115200
+ 
+-uint8_t debug_char_available(void):
+ Verifica se sono presenti dei caratteri nel buffer di ricezione
+ 
+-uint8_t debug_read_char(void):
+ Legge un carattere dalla seriale
+ 
+-void debug_write_char(char dato):
+ Scrive un carattere sulla seriale
+ 
+-void debug_print(char* message):
+ Scrive una stringa di testo sulla seriale

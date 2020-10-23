@@ -1,0 +1,38 @@
+Appl_Motor
+
+Questo modulo contiene il codice ad alto livello che si occupa di gestire il funzionamento del motore.
+Per ottenere questi risultati, il modulo si basa sui driver hardware "gestione_motore", e contiene una
+funzione di inizializzazione ad alto livello, una funzione di invio richieste al gestore del motore e 
+il gestore del motore vero e proprio.
+
+Nel caso dell'Argo EC Pro, il motore non necessita di un controllo di posizione, per cui le funzioni 
+richieste sono l'accensione e lo spegnimento del motore.
+Nel caso in cui, invece, ci sia bisogno di un vero e proprio controllo assi, in questo modulo
+si troveranno le funzioni che controllano il posizionamento angolare del motore, dalla partenza
+fino all'arresto nella posizione richiesta.
+
+Questa porzione di codice, inoltre, implementa il controllo della corrente assorbita dal motore
+durante il funzionamento, per prevenire il rischio di impigliamento all'interno dell'ingranaggio.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+-static char* mot_ev_to_str(uint8_t event): 
+ Gestisce l'associazione di stringhe di testo in Program Memory agli eventi inviabili al motore per la sua gestione.
+
+-static uint16_t mot_current(void): 
+ Misura della corrente assorbita dal motore mediante la lettura di un valore analogico sul piedino 0 del microcontrollore.
+
+-MOT_STAT *motor_get_status(void): 
+ Funzione che restituisce lo stato in cui si trova la macchina a stati di gestione del motore.
+
+-uint8_t motor_send_event(uint8_t event): 
+ Gestore degli eventi inviabili al motore; valore restituito:
+						  -0: Nessun evento inviato
+						  -1: Inviato evento di start
+						  -2: Inviato evento di stop
+						  -3: Errore nel parametro "event"
+						  -4: Evento inviato nello stato "BLOCCATO"
+
+-void motor_hand(void): 
+ Macchina a stati principale per la gestione della movimentazione del motore

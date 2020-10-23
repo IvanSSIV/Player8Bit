@@ -1,0 +1,18 @@
+Serial_Command
+
+Il modulo Serial_Command contiene le funzioni per abilitare e disabilitare il debug selettivo per ogni modulo presente all'interno del codice.
+Vengono attivate corrispondenze fra caratteri inviati sulla seriale e flag di abilitazione, che a loro volta vanno ad intervenire
+all'interno delle funzioni di debug per stabilirne l'effettiva stampa.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void serial_get_command(void):
+ Legge il comando dalla seriale di debug per l'attivazione e la disattivazione individuale del debug dei singoli moduli
+ 
+-void serial_cmd_handle(char c):
+ Gestisce i comandi ricevuti sulla seriale, attivando e disattivando i flag di debug
+ 
+-void serial_debug_init(void):
+ Inizializza i flag di abilitazione debug

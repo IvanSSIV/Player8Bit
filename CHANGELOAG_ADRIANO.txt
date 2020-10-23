@@ -1,0 +1,25 @@
+*------------*
+* 17/10/2020 *
+*------------*
+- stese specifiche comandi con sequenze di ESC
+- scritta gestione sequenze di ESC (modulo principale)
+- razionalizzato codice specifico per player
+  - in cartella "Specific_Code" creato cartelle di player EC,ecc
+  - in cartella EC creato cartelle
+    - Erog
+    - Motor
+    - Special_func
+    - Command
+- spostati Erog e Motor da root di Application_Code a cartella di 
+  player
+ 
+*------------*
+* 18/10/2020 *
+*------------*
+- fatto test connessione a server e sistemato messaggi di log 
+- testato funzionamento gestore di comamdi ad top level
+- introdotta cartella Test come contenitore "pulito"
+  per codice da testare
+- creato e testato gestore comandi specifico per EC
+  con test delle API per avvire e fermare Erog
+- creati prototipi funzione gestori specifici per Lanzi

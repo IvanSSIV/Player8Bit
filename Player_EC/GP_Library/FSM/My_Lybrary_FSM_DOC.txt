@@ -1,0 +1,61 @@
+My_Library/FSM
+
+I moduli FSM_Template e Tiny_FSM_Template sono costituiti da definizioni di strutture che semplificano l'implementazione di una macchina
+a stati finiti. Queste strutture contengono tutti i dati necessari all'utilizzo efficiente di una macchina a stati, ovvero:
+
+	-stato corrente della macchina
+	-stato di provenienza
+	-4 timer indipendenti per operazioni di temporizzazione
+	-vettore con i nomi degli stati
+	-abilitazione alla stampa per cambi di stato e primo passaggio all'interno di uno stato
+	-stringa di 3 caratteri distintiva della macchina per distinguerla dalle altre nella stampa di debug
+	
+Il modulo Tiny_FSM_Template, invece, include solo le funzioni necessarie al funzionamento senza stampa e senza tracciamento
+dei passaggi di stato, in modo da rendere il codice estremamente più leggero ed efficiente. In questo modo, le macchine a stati
+secondarie per la gestione di alcune funzioni particolari non richiedono un dispendio di risorse troppo elevato.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+//////////                      FSM_Template                         //////////
+
+-void fsm_init(FSM_WORK *fsm,uint8_t initstat, char** state_name, uint8_t max_state,char *name):
+ Inizializza una struttura del tipo FSM_WORK, che contiene tutti i dati necessari al funzionamento
+ di una macchina a stati finiti del tipo complesso.
+ 
+-fsm_set_state(FSM_WORK *fsm, uint8_t new_state):
+ Imposta lo stato di una macchina a stati nella struttura di tipo FSM_WORK corrispondente
+ 
+-void fsm_set_timer_light(FSMLIGHT_WORK* fsm, uint8_t timer_num):
+ Inizializza un timer in una macchina a stati di tipo leggero nella struttura di tipo FSMLIGHT_WORK corrispondente
+ 
+-void fsm_set_timer(FSM_WORK* fsm, uint8_t timer_num):
+ Inizializza un timer in una macchina a stati di tipo complesso nella struttura di tipo FSM_WORK corrispondente
+ 
+-BOOL fsm_timer_light_hand(FSMLIGHT_WORK* fsm, uint8_t timer_num, uint16_t delay):
+ Gestione dei timer delle macchine a stati di tipo leggero
+ 
+-BOOL fsm_timer_hand(FSM_WORK* fsm, uint8_t timer_num,uint32_t setdelay):
+ Gestione dei timer delle macchine a stati di tipo complesso
+ 
+-void fsm_ena_print(FSM_WORK* fsm, BOOL chg, BOOL first,BOOL crlf):
+ Assegnazione dei flag di abilitazione ad una macchina a stati del tipo complesso
+ 
+-static void fsm_print_state(FSM_WORK* fsm, uint8_t new_state):
+ Stampa dello stato di provenienza e dello stato di arrivo di una macchina a stati del tipo complesso
+ 
+-BOOL fsm_first_scan(FSM_WORK* fsm,char * message):
+ Funzione che verifica il primo passaggio all'interno dello stato "message" di una macchina a stati del tipo complesso
+
+-static void fsm_get_stat_message(FSM_WORK *fsm, uint8_t state, char* buff, uint8_t size):
+ Funzione che assegna allo stato di una macchina a stati del tipo complesso la stringa in Program Memory corrispondente
+ 
+//////////                   FSM_Tiny_template                     //////////
+
+-void FSMTINY_set_timer(TINY_FSM* fsm):
+ Inizializza un timer in una macchina a stati di tipo "tiny" nella struttura TINY_FSM corrispondente
+ 
+-BOOL FSMTINY_timer_EOT(TINY_FSM* ptr, uint32_t timer_val):
+ Gestione del timer di una macchina a stati del tipo "tiny" all'interno della struttura TINY_FSM corrispondente
+

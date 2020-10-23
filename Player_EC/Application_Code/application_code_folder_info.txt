@@ -1,0 +1,44 @@
+           --------------------------------------------------
+           risorse in cartella "application_code"  19-09-2020
+           --------------------------------------------------
+
+Questa cartella contiene la parte "application oriented" dell'applicazione
+A sua volta contiene delle sottocartelle specifiche per le
+varie esigenze .
+
+- Init
+  Contiene la "Init" di applicazione che richiama la varie funzioni di 
+  inizializzazione dei dispositivi hardware utilizzati.
+  Al top level viene chiamata dalla Init() di Arduino
+
+- Main
+  E' il main dell'applicazione . Al top level viene chiamata dall Loop() di Arduino.
+  E' strutturata con una organizzazione PLC-like ovvero :
+  - lettura ingressi
+  - elaborazione
+  - attivazione uscite
+  Con pochissime eccezioni gli ingressi e uscite sono gestite attraverso un 
+  immagine di processo (ovvero variabili in memoria) gestite tramite apposite
+  librerie.
+  Non vi sono attivazioni dirette (stile DigitalRead() o DigitalWrite()).
+  La cartella "Application_Main" contine anche il file "globvar.cpp" e 
+  "globavar.h" che contengono le definizioni delle strutture dei dati globali
+  all'applicazione.
+
+- Logica
+  Contiene la FSM principale dell'applicazione che e' il "cervello" della
+  macchina e coordina tutte le attività necessarie ad implementare 
+  l'applicazione richiesta.
+
+- Specific_code
+  Contiene quella parte di codice specifica del modello di player 
+  La Erog e' suddivisa in cartelle con il nome del player specifico EC,KD,ecc.
+  All'interno della sottocartella dello specifico player sono presenti
+  una serie di moduli prestabiliti più eventuali specifici.
+  - Appl_Erog_xx.cpp , Appl_Erog_xx.h
+    Gestisce l'erogazione del prodotto specifica del player
+  - serial_ESC_xx.cpp , serial_ESC_xx.h
+    Gestisce i comandi <ESC> specifici
+  Per uniformita di gestione a livello di linker tutti i moduli hanno funzioni
+  con lo stesso nome , ma uno solo e' abilitato al livello di preprocessore
+  con l'uso di direttive #if

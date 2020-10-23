@@ -1,0 +1,26 @@
+In questo folder sono contenuti i moduli per la gestione dell'anagrafica.
+
+- anag_def.h
+  Header contenente la definizione della strutture per la gestione dell'anagrafica
+
+- anag_lib.cpp , anag_lib.h
+  Modulo base della libreria per la gestione dell'anagrafica
+
+- anag_logicFSM.cpp , anag_anag_logicFSM.h
+  Modulo che occupa di interfacciarsi con la macchina a stati principale per
+  leggere e caricare in memoria l'anagrafica da LAN,SD,o EEPROM  
+
+- anag_write.cpp , anag_write.h
+  Modulo che occupa di interfacciarsi tra il gestore del server e gli
+  strati inferiori per salvare l'anagrafica.
+  Si appoggia su "anag_API" per scrivere il file.
+
+- anag_read.cpp , anag_read.h
+  Modulo che si occupa li leggere (cercare) un badge nel file dell'anagrafica
+  Si appoggia su "anag_API" per leggere il file.
+
+- anag_API.cpp , anag_API.h
+  Strato intermedio tra "anag_write" e"anag_read" ,e le API a basso livello per
+  gestire la redirezione della scittura sulla SD con le librerie di Arduino
+
+  

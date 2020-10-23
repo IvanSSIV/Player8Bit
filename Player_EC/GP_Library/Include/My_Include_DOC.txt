@@ -1,0 +1,3 @@
+My_Include
+
+File header di inclusione di costanti e definizioni necessarie a livello globale all'interno del progetto, 

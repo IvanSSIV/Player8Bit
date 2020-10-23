@@ -1,0 +1,9 @@
+void dbg_HW_TP0_ON(void);
+void dbg_HW_TP0_OFF(void);
+void dbg_HW_TP1_ON(void);
+void dbg_HW_TP1_OFF(void);
+void dbg_HW_TP2_ON(void);
+void dbg_HW_TP2_OFF(void);
+void dbg_HW_TP3_ON(void);
+void dbg_HW_TP3_OFF(void);
+void dbg_HW_init(void);

@@ -1,0 +1,157 @@
+La gestione del server e' strutturato come un modulo indipendente che si
+occupa di gestire le attivita di interrogazione del server e di ricezione
+delle relative risposte .
+Va visto come un blocco chiuso che nasconde la complessita delle operazioni
+di interfacciamento con il server e dialoga con l'applicazione mediante
+alcune funzioni di interfaccia.
+La gestione del server si appoggia su tre funzioni basilari:
+-server_request_send()
+-server_request_hand()
+-server_request_state()
+
+funzione "server_request_send"
+------------------------------
+La server_request_send viene chiamata da un modulo esterno (es. FSM del PLC) 
+per richiedere un servizio al server.
+
+funzione "server_request_hand"
+------------------------------
+La "server_request_hand" si occupa di scodare ed eseguire le richieste inviate
+dalla "server_request_send". Attualmente la coda è di un singolo elemento, 
+ma concettualmente può essere possibile accodare più richieste.
+
+La server_get_hand_state fornisce al modulo esterno lo stato in cui si trova
+la macchina a stati implementata all'interno della server_request_hand, ovvero 
+lo stato di esecuzione e risposta delle richieste inviate.
+
+La server_request_send è una funzione non sospensiva, e setta una richiesta 
+di un servizio. Riceve 2 parametri:
+-ID del servizio richiesto o inviato (ACCESA, PCTIME,...)
+-Puntatore ad array di caratteri opzionale per servizi non completamente 
+descritti dalla richiesta del servizio stesso.
+	
+Restituisce l'esito: TRUE se è stata presa in carico la richiesta perchè il servizio HAND era vuoto, FALSE se la precedente
+richiesta pendente è ancora in esecuzione.
+
+La server_request_hand viene continuamente chiamata dal main di applicazione (appl_main), ed è basata su una FSM autonoma che
+gestisce le varie fasi dell'interrogazione verso il server. A sua volta, si appoggia su un modulo (server_utility) che
+esegue le varie operazioni (invio interrogazione, attesa risposta, decodifica risposta, etc.) ad alto livello.
+
+L'applicazione, nella sua interezza, è strutturata su un certo numero di FSM principali, che si occupano dei macroblocchi in cui
+l'applicazione stessa è suddivisa:
+	-FSM_PLC si occupa della logica di macchina (I/O)
+	-FSM_Server di cui sopra
+	-FSM_SD si occupa della gestione dello storage dei dati
+
+L'attività odierna si inserisce nel contesto della macchina a stati principale mediante la creazione di una macchina a stati
+secondaria che gestisce il dialogo con il modulo appl_server per gestire le attività connesse alla richiesta di servizi e 
+relative risposte.
+
+Il modulo "server_utility" contiene tutte quelle funzioni che non fanno parte del gestore ad alto livello del server, ma 
+si occupano delle singole operazioni che devono essere effettuate.
+Sono implementate anche in questo caso strutture di automi a stati finiti, che gestiscono l'invio del messaggio, l'attesa
+della risposta e le successive decodifica e salvataggio dei dati ricevuti.
+Questo modulo, inoltre, si occupa dell'impostazione dei parametri di connessione, dell'apertura e chiusura della connessione
+fra client e server, della verifica dell'avvenuta connessione al server, e della gestione più generica delle eventuali
+informazioni relative alla connessione.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+//////////                       appl_server                         //////////
+
+-void Server_init(void): 
+ Inizializza la macchina a stati di gestione del server
+
+-void Server_request_hand(void): 
+ Funzione che "scoda" le richieste ed esegue i comandi ricevuti dai moduli esterni
+
+-static void server_print_answer_code(server_answer_code code): 
+ Funzione che stampa su seriale il codice relativo alla risposta ricevuta dal server
+
+-static BOOL Server_check_answer(server_msg_id msg_id, char* server_answer): 
+ Funzione di controllo della validità della risposta ricevuta dal server
+
+-static server_answer_code Server_decode_answer(server_msg_id msg_id, char* server_answer): 
+ Gestisce le varie risposte ricevute in seguito ad una richiesta al server
+
+-BOOL Server_request_send(uint8_t event, server_msg_id prm_msg_id,char *usr_payload): 
+ Funzione che gestisce l'invio di richieste al gestore del server
+
+-event_hand_retval Server_get_event_hand_state(void): 
+ Funzione che restituisce lo stato in cui si trova il gestore del server
+
+//////////                      server_utility                       //////////
+
+-void server_set_connection_param(void): 
+ Funzione che preleva dal file di configurazione	i parametri per la connessione al server
+
+-BOOL server_LAN_connection(void):
+ Funzione che effettua il test di connessione al server
+
+-BOOL server_invia_messaggio_senza_risposta(void):
+ Funzione che invia al server un messaggio che non richiede risposta per il proseguimento del funzionamento
+
+-BOOL server_invia_messaggio_con_risposta(void): 
+Effettua tutte le operazioni necessarie all'invio di un messaggio al server, compresa l'attesa di una risposta
+
+-uint8_t server_read_answer(char *answer,uint16_t answ_size): 
+ Inserisce nel vettore answer la risposta del server
+
+-void server_start_read(void):
+ Prepara il vettore per la memorizzazione della risposta ricevuta dal server
+ 
+-static BOOL server_read_rx_line(void):
+ Legge una stringa in arrivo dal server, e restituisce TRUE quando legge un CR
+ 
+-static BOOL server_find_init_payload(char* buff)
+ Identifica il termine #PAY_START nella risposta ricevuta dal server e da l'OK alla lettura della risposta
+
+-static BOOL server_find_end_payload(char* buff)
+ Identifica il termine #PAY_START nella risposta ricevuta dal server e ferma la lettura della risposta
+
+- static void server_salva_riga_ricevuta(char* buff)
+ Salva una riga ricevuta dal server
+ 
+-static void memorizza_risposta(char* answer, uint16_t answ_size):
+ Salva la risposta ricevuta dal server all'interno di answer
+ 
+-static void server_visualizza_dati_ricevuti(BOOL ena, uint8_t ident, char* buff, const char* intestazione):
+ Stampa su seriale di debug dei dati ricevuti dal server come risposta alla richiesta effettuata
+ 
+-static void get_config_numero_PC(char* name, uint8_t size):
+ Estrae dal file config il numero PC da inserire all'interno di ogni messaggio inviato
+
+-static void get_firmware_versione(char* fwvers, uint8_t size):
+ Aggiunge al messaggio "ACCESA_" la versione di firmware della macchina
+ 
+-static void serv_strncat(char* message)
+ Concatena la stringa message al tx_message_payload, ovvero il parametro variabile del messaggio che verrà inviato al server
+ 
+-static void serv_msg_start(const char* message)
+ Inizializza la stringa per il messaggio che verrà inviato al server
+  
+-static void server_make_message(void)
+ Compone la stringa completa del messaggio da inviare al server, con le parti fisse (Numero PC e chiave univoca) e la parte opzionale
+  
+-static void print_open_status(void)
+ Stampa sulla seriale di debug il risultato dei tentativi di connessione al server e il tempo impiegato
+ 
+-BOOL server_open(void):
+ Funzione che prova a connettersi al server
+
+-void server_close(void):
+ Funzione che termina la connessione con il server
+
+-void server_transmit(void):
+ Funzione che stampa sul client gli header, il messaggio e i footer per l'invio delle richieste al server
+
+-void Ethernet_print_info(void):
+ Stampa sulla debug di seriale i parametri utilizzati per la connessione al server
+
+-char * serv_ID_to_str(SRV_MSG_ID ID):
+ Associa l'ID del messaggio da inviare al server ad una stringa di testo
+
+-void serv_event_to_str(uint8_t event, char* msg, uint8_t size):
+ Associa l'evento chiamato dal gestore del server ad una stringa di testo descrittiva per la stampa su seriale di debug 

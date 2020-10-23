@@ -1,0 +1,13 @@
+Appl_Init
+
+Il modulo appl_init contiene tutte le funzioni che effettuano l'inizializzazione dei singoli moduli
+che costituiscono il firmware. Questo modulo contiene la funzione da inserire all'interno del "setup"
+di Arduino, e includerà sempre tutte le inizializzazioni di tutti i moduli, sia driver hardware che
+codice macchina.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+-void appl_init(void): 
+ Funzione che contiene tutte le inizializzazioni dei singoli moduli, e si occupa di rendere la funzione 
+ "setup" di Arduino il più portabile possibile.

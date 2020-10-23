@@ -1,0 +1,35 @@
+DESCRIZIONE FUNZIONALITA' MODULI Player_EC
+
+1-Badge
+	Si occupa della lettura fisica del badge attraverso l'uso della Serial2, accumula i dati e termina la lettura con un meccanismo di timeout.
+	Non è triggerata nè terminata da un particolare carattere di controllo. Effettua il filtraggio dei caratteri di controllo per evitare
+	informazioni spurie. Dispone di una funzionalità "all" per catturare fisicamente qualsiasi carattere presente sulla seriale.
+	La cattura parte dalla condizione di riposo all'arrivo del primo carattere della stringa, e termina con un timeout a 1000ms.
+	Allo scadere del tempo, viene esaminato il contenuto del buffer appena ricevuto. Esegue un controllo preliminare di accettabilità
+	del badge e notifica agli altri moduli l'avvenuta ricezione. Si interfaccia ai rimanenti moduli mediante le seguenti funzioni:
+		
+		BOOL badge_present(void): Restituisce TRUE se è stato letto un badge con congruità minime.
+		
+		void badge_get_last_reading(char* read_badge, uint8_t size): Inserisce in un buffer passato come parametro il contenuto
+		                                                             pulito dell'ultimo badge letto.
+																	 
+		void badge_ena_read(void): Abilita la lettura dei badge; all'atto dell'abilitazione, pulisce il buffer della seriale da eventuali
+		                           caratteri spuri presenti.
+		
+		void badge_dis_read(void): disabilita la lettura dei badge.
+		
+	La Badge è un modulo tipicamente general purpose, quindi che può funzionare su tutti i tipi di dispositivi.
+		
+
+2-Erog
+	Si occupa di erogare fisicamente il prodotto, ovvero delle azioni relative al motore e ai due ingressi di rilevamento. Partendo da una
+	condizione di riposo, attiva il motore se rileva la presenza della mano all'interno della feritoia, conta la caduta dei due inserti
+	auricolari e termina le attività.
+	Visto da un'applicazione ad alto livello, astrae i dettagli dell'erogazione. Si interfaccia ai moduli ad alto livello con le seguenti
+	funzioni:
+	
+	    void erog_event_send(uint8_t EROG_EV_ID): Riceve la richiesta di un evento di erogazione, che scatena le attività connesse.
+		da introdurre
+		uint8_t get_erog_result(void): restituisce l'esito dell'erogazione (EXEC/DONE/ERROR/FAIL).
+		
+	La Erog è un modulo fortemente "application_oriented", legato alla tipologia di prodotto da erogare e al tipo di distributore.

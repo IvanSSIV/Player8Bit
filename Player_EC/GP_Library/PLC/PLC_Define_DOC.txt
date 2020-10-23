@@ -1,0 +1,4 @@
+My_Library/PLC_Define
+
+Il file PLC_Define contiene le definizioni mnemoniche di ingressi e uscite del PLC, per poterle utilizzare all'interno del codice applicazione
+senza ricorrere al nome "IN_X" o "OUT_Y".

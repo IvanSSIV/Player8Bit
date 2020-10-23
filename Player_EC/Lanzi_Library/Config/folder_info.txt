@@ -1,0 +1,16 @@
+In questo folder sono contenuti i moduli per la gestione del config.
+- config_def.h
+  Header contenente la definizione della struttura che contine il config
+
+- config_read.cpp , config_read.h
+  Moduli che occupano di interfacciarsi con la macchina a stati principale per
+  leggere e caricare in memoria il config da LAN,SD,o EEPROM  
+
+- config_read.txt
+  testo con descizione funzionamento modulo
+
+- config_decode.cpp , config_decode.h
+  Moduli che effettuano la decodifica dei singoli menbri del config come
+  ricevuti da LAN o SD
+
+  

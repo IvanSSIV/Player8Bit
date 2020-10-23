@@ -1,0 +1,38 @@
+Debug_Utility
+
+Questo modulo contiene tutte le funzioni che si occupano di stampare il debug 
+su seriale ad alto livello.
+Le funzioni di questo modulo gestiscono l'abilitazione selettiva delle 
+stampe di debug, la formattazione della stringa da stampare, e 
+la stampa dell'indice dei millisecondi trascorsi dall'avvio del microcontrollore.
+Una stampa così strutturata permette di verificare l'effettiva esecuzione 
+delle istruzioni fondamentali, e diagnosticare errori mediante la
+possibilità di attivare e disattivare singolarmente il debug per ogni modulo.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void debug_print_timestamp(BOOL ena, char* msg):
+ Stampa sulla seriale un messaggio corredato dai millisecondi rilevati dal tick di sistema
+ 
+-void debug_print_CRLF(BOOL ena):
+ Stampa un CRLF sulla seriale di debug
+ 
+-void debug_print_timestamp_rel(BOOL ena, char* msg, DWORD ts):
+ Stampa un messaggio sulla seriale con un timestamp relativo
+ 
+-void debug_print_timestamp_ident(BOOL ena, BYTE ident, char* msg):
+ Stampa un messaggio indentato sulla seriale di debug
+ 
+-void debug_printbuff_hex(BOOL ena, BYTE* buff, BYTE buff_size):
+ Stampa sulla seriale di debug un buffer in esadecimale
+ 
+-static void print_timestamp(BOOL ena, DWORD ts):
+ Stampa il tick dei millisecondi del microcontrollore sulla seriale
+ 
+-void debug_print_ena(BOOL ena, char* message):
+ Stampa semplice sulla seriale di debug
+ 
+-void debug_print_timestamp_title(BOOL ena,uint8_t ident, char* title, char* msg):
+ Stampa un messaggio sulla seriale di debug con indentazione e titolo del messaggio

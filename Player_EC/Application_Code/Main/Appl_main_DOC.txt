@@ -1,0 +1,13 @@
+Appl_Main
+
+Il modulo appl_main svolge la vera e propria funzione del main di codice: contiene tutte le istruzioni da eseguire
+sequenzialmente dopo l'avvio e l'inizializzazione della macchina, e in questo caso è gestito con la temporizzazione
+basata sull'API "millis()" di Arduino. Questa funzione restituisce un tick in millisecondi, che viene utilizzato
+per cadenzare l'esecuzione delle varie funzioni a intervalli di 10, 100 e 1000 ms.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+-void appl_main(void): 
+ Funzione che contiene tutte le logiche ad alto livello dei vari moduli. Viene utilizzato per scandire l'esecuzione
+ in base tempi da 10, 100 e 1000 ms, mentre per alcune funzioni è consigliabile il metodo "free run".

@@ -1,0 +1,42 @@
+                    -----------------------------------------------
+                           libreria "Hardware"  19-09-2020 
+                    ----------------------------------------------- 
+
+Raggruppa tutto il codice strettamente hardware dipendent specifico per 
+la scheda Lanzi a 8 bit con micrcontrollore ATMega2560
+
+Descrizione contenuto cartella
+------------------------------
+- Lanzi_8bit_2560.h
+  Contiene l'elenco degli include utilizzati dai vari moduli della libreria
+  Ogni modulo della libreria contiene nell'instestazione :
+  - Lanzi_8bit_2560.h
+  - Eventuali include di Arduino specifici 
+  - i file *.h del modulo stesso
+
+- cartella "Badge"
+  Contiene le API per interfacciare la gestione Badge ad alto livello con
+  i driver hardware specifici di schea.
+
+- cartella "CPU_core"
+  Contiene le funzioni specifiche del Core CPU usato nella scheda
+
+- cartella "Debug"
+  Contiend le API di interfaccia per il debug specifiche della scheda
+
+- cartella "Display"
+  Contiene le primitive di gestione dell'LCD a basso livello
+
+- cartella "Motore"
+  Contiene le primitive di gestione del motore a basso livello
+
+- cartella "RTC"
+  Contiene le primitive di gestione del RTC DS1307 usato nella scheda
+
+- cartella "PLC_IO"
+  Contiene i driver a basso livello per leggere e scrivere gli I/O 
+  digitali della scheda
+
+
+
+

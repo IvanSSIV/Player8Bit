@@ -1,0 +1,150 @@
+                -----------------------------------------
+                descrizione FSM Logica  V1.01  19-09-2020
+                -----------------------------------------
+
+Questo modulo implementa la macchina a stati principale dell'applicazione che
+governa ad alto livello tutta l'architettura dell'applicazione.
+Tutte le applicazioni LANZI sono organizzate in modo simile.
+La macchina a stati principale e' organizzata in un certo numero di stati
+divisi in tre macro gruppi .
+- stati di inizializzazione e configurazione
+- stati operativi 
+- stati di errore
+Per motivi di pulizia del codice la FSM principale e' strutturata con un funzione per
+ogni stato che nasconde ad alto livello i dettagli delle attivita di ogni singolo stato.
+Al topo level la FSM principale e' costituita da uno switch e da "n" funzioni una
+per ogni stato . Le singole funzioni di stato restituiscono un enum FSM_RETVAL con
+l'esito delle operazione.
+Per mantenere pulita e comprensibile il flusso di operazioni , ogni cambio di stato 
+avviene sempre al "top-level" in funzione dell'esito delle specifiche funzioni di stato.
+Sono stati eliminati i cambi di stato all'interno dei singoli stati , che benche 
+siano formalmente corretti e funzionanti , non consentono una facile tracciatura
+del percorso di funzionamento.
+In questo modo basta analizzare il codice della funzione "appl_logica_main" per
+avere una visione di assieme del flusso della macchina.
+
+
+Gli stati della FSM_logica possono essere raggruppati sotto tre gruppi distinti :
+- stati inizializzazione
+  Si occupano di configurare e inizializzare le informazioni necessaria al funzionamento
+  della macchina .
+  - ST_LOGIC_INIT
+  - ST_LOGIC_READ_CONFIG
+  - ST_LOGIC_READ_ANAG
+  - ST_LOGIC_FILL_STATUS
+  - ST_LOGIC_PCTIME
+  - ST_LOGIC_SEND_OFFLINE
+
+- stati operativi
+  - ST_LOGIC_MAIN
+  - ST_LOGIC_FIND_ZERO
+  - ST_LOGIC_BADGE
+  - ST_LOGIC_HAND_ONLINE
+  - ST_LOGIC_HAND_OFFLINE
+  - ST_LOGIC_SELECT
+  - ST_LOGIC_EROG
+
+- stati errore
+
+Comportamento generale
+----------------------
+Completata la seguenza di inizializzazione la macchina a stati passa per "ST_LOGIC_MAIN"
+dove vengono effettuate le verifiche funzionali necessarie .
+Questa macchina a stati non ha uno stato prestabilito (a differenza di altre) ma
+per il tipo di applicazione svolta rimarra per la maggior parte del tempo in 
+stato "ST_LOGIC_BADGE" . 
+Da questo stato esce tipicamente per due motivi :
+- passato un badge e quindi si attiva la sequenza di erogazione
+  La sequenza tipica degli stati sara quindi :
+  - ST_LOGIC_BADGE
+  - ST_LOGIC_HAND_ONLINE
+  - ST_LOGIC_HAND_OFFLINE
+  - ST_LOGIC_SELECT
+  - ST_LOGIC_EROG
+  - ST_LOGIC_MAIN -> ST_LOGIC_BADGE
+- trascorso un tempo prestabilito e viene effettuata la richiesta di PC-TIME
+  La sequenza tipica degli stati sara quindi :
+  - ST_LOGIC_BADGE
+  - ST_LOGIC_PCTIME
+  - ST_LOGIC_SEND_OFFLINE
+  - ST_LOGIC_MAIN -> ST_LOGIC_BADGE
+Come si evince dalle sequenze ogni volta che la macchina esegue qualche attività
+passa sempre per la ST_LOGIC_MAIN . 
+
+Descrizione stati 
+--------------------
+- stato ST_LOGIC_INIT    
+  Si attiva una sola volta dopo un reset e si occupa di :
+  - inizializzare dati, strutture e FSM slave
+  - verficare condizioni di guasti hardware
+  - emettere il messaggio di "ACCESA"
+
+- stato ST_LOGIC_READ_CONFIG
+  Si occupa di leggere e validare il config . La lettura avviene da LAN , SD o EEPROM
+  in questa sequenza :
+  - viene letto da LAN , se fallisce 
+  - viene letto da SD , se fallisce
+  - viene letto da EEPROM
+
+- stato ST_LOGIC_READ_ANAG
+  Si occupa di leggere e validare l'anagrafica dei badge abilitati . 
+  La lettura avviene da LAN , SD o EEPROM in questa sequenza :
+  - viene letto da LAN , se fallisce 
+  - viene letto da SD , se fallisce
+  - viene letto da EEPROM (solo su 32bit)
+
+- stato ST_LOGIC_FILL_STATUS
+  Gestisce i file apertura,chiusura,anagrafica.dat.
+  A partire da questi file ricostruisce la mappa di occupazione di celle e settori.
+  Su alcuni tipi di macchine (es:EC) non e' implementato
+
+- stato ST_LOGIC_PCTIME                        
+  Viene lanciato ciclicamente (tipicamente 60 sec) , verifica la connessione e in
+  caso affermativo legge l'ora dal server e corregge il RTC locale. Come risultato
+  della lettura aggiorna il flag di LAN_OK per gli usi successivi.
+
+- stato ST_LOGIC_SEND_OFFLINE
+  Viene richiamato dopo una lettura del PCTIME avvenuta con successo verifica la
+  presenza di eventuali file Offline , li invia al server , e previa conferma
+  li cancella .
+
+- stato ST_LOGIC_MAIN
+  Passa in questo stato nei seguenti casi :
+  - al termine della inizializzazione dopo il reset , indipendentemente
+    dall'esito delle operazioni
+  - dopo ogni PC_TIME 
+  - dopo ogni procedura di erogazione del prodotto
+  Compito di questo stato e' :
+  - verificare la presenza di condizioni bloccanti e mandare la FSM in stato FAIL.
+  - verificare eventuali condizioni di errore e mandare la FSM in stato ERROR.
+  - gestire attivita di statistica 
+ 
+- stato ST_LOGIC_FIND_ZERO                        
+  Effettua la ricerca dello zero dell'asse del tamburo per le macchine che lo richiedono
+
+- stato ST_LOGIC_BADGE
+  E' lo stato in cui si trova la macchina per la maggior parte del tempo. 
+  Le attivita svolte in questo stato sono :
+  - attesa arrivo di un badge .I dettagli della gestione sono demandati a una 
+    FSM apposita
+  - temporizzazione per attivazione PC_TIME
+  - gestione dello stand-by dell'illuminazione (per le macchine che ne sono dotate)
+
+- stato ST_LOGIC_HAND_ONLINE
+  Gestisce le operazioni per richiedere le autorizzazioni con LAN connessa mediante
+  richieste al server. In caso di fallimento della richiesta per mancata connessione.
+
+- stato ST_LOGIC_HAND_OFFLINE
+  Gestisce le operazioni per richiedere le autorizzazioni OFF_line (condizione di sconnessione)
+  mediante l'uso di ...
+
+- stato ST_LOGIC_SELECT
+  Effettua la selezione del prodotto nelle macchine in cui esiste questa possibilita.
+  In alcuni tipi di macchine (es:EC) non e' implementato.
+
+- stato ST_LOGIC_EROG
+  Gestione le operazioni di erogazione prodotti . Le attivita specifiche del tipo di player
+  sono demandate ad una FSM dedicata (FSM_erog)
+
+- stato ST_LOGIC_RICHIESTA_AUTORIZZAZIONE
+  Richiede le autorizzazioni speciali

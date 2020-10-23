@@ -1,0 +1,34 @@
+Gestione_RTC
+
+In questo modulo troviamo le funzioni di gestione a basso livello del chip DS1307.
+Queste funzioni si occupano della sua inizializzazione, della lettura e scrittura 
+di dati da e sul chip, e del controllo di eventuali failure
+hardware o software. In questo caso, è stata implementata la libreria di Arduino 
+"DS1307RTC", che fornisce alcune funzioni aggiuntive, fra cui
+proprio quelle di gestione dei malfunzionamenti e il salvataggio di data e ora 
+all'interno di una struttura di dati specifica per questa applicazione.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void RTC_init_LL(void):
+ Inizializzazione a basso livello del chip W5100 con failure controllo
+ 
+-BOOL RTC_gettime_low_level(void):
+ Legge data e ora a basso livello e le inserisce in una struttura leggibile dal codice
+ ad alto livello; restituisce TRUE ad ogni cambio di secondo
+ 
+-static BOOL RTC_get_datetime_LL(RTC_WORK* my_tm):
+ Inserisce nella struttura passata come parametro i valori di data e ora letti
+ dal DS1307
+ 
+-void RTC_gettime_HL(RTC_WORK* time_buff):
+ Legge e passa ad alto livello i valori di data e ora letti dall'RTC; deve essere chiamata
+ non appena la RTC_get_datetime_LL ha restituito TRUE
+
+-void RTC_settime_LL(RTC_WORK* time_buff):
+ Imposta i valori di data e ora ricevuti dal server all'interno del DS1307
+ 
+-void RTC_disalign_LL(void):
+ Funzione di test per disallineare l'RTC tramite comando seriale

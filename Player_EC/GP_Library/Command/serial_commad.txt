@@ -1,0 +1,111 @@
+          *-----------------------------------------*
+          *  gestione sequenze di ESC  (17-10-2020) *
+          *-----------------------------------------*
+  I comandi basati sulle sequenze di ESC sono pacchetti di comandi che
+  iniziano sempre con il carattere ESC (hex 0x1B).
+  Derivano da concetti un tempo molto usati ma tuttora assolutamente validi 
+  vedi https://en.wikipedia.org/wiki/Escape_sequence  e
+       https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences .
+  
+  Puo' sembrare un po "retro" ma un protocollo semplice , conciso , efficiente 
+  e facilmente espandibile.
+  Quello che vi va ad implementare non ha la pretesa di essere uno standard ma 
+  e' una implementazione specifica per le applicazioni  LANZI.
+  L'mplementazione della sequenza di <ESC> e' costruito attorno ad una FSM il 
+  cui cambio di stato e' pilotato dalla "sequenza" di caratteri in arrivo. 
+  E' intrinsicamente molto veloce e non sospensiva.
+ 
+  Si presta molto bene ad essere automatizzata mediante comandi di script da PC .
+  
+  La sequenza e' composta da un minimo di tre caratteri
+  
+  - carattere <ESC>
+   Il gestore dei comandi si trova sempre in una condizione di attesa del
+   carattere di ESC . In questa condizione qualunque altro carattere viene 
+   rifiutato.
+   Alla ricezione del carattere di <ESC> passa in attesa del primo carattere.
+ 
+  - primo carattere 
+   Il primo carattere dopo <ESC> e' costituito da un lettera del set di 
+   caratteri ASCII e serve a stabilire il gruppo di comandi .
+   Come primo carattere sono ammesse solo le lettere A-Z .
+   La gestione non e' case sensitive.
+   Alla ricezione di uno dei caratteri supportati passa all'attesa della
+   ricezione del terzo carattere
+
+  - secondo carattere
+   Il terzo carattere stabilisce il comando specifico e nella maggior parte
+   dei casi chiude la sequenza . Come secondo carattere sono ammessi i
+   caratteri A-Z e i numeri 0-9 : qualunque altro carattere ASCII non e' 
+   ammesso.
+   In alcuni casi specifici dopo il secondo carattere sono ammessi dei parametri .
+   Se come secondo carattere e' inserito il carattere * significa che segue un
+   codice mnemonica da tre caratteri.
+
+  - caratteri successivi
+   Alcuni comandi ammettono ulteriori comandi dal terzo in poi.
+   Il quarto carattere ha una funzione particolare :
+   - [ = inizio parametro
+     I comandi che ammettono parametri richiedono che il parametri siano
+     incapsulati tra una coppia di caratteri "[]".
+     esempio : <ESC>S1[192.168.001.100]
+               imposta il parametro 1 del setup con 192.168.001.100     
+   - ? = richiesta informazioni
+     esempio : <ESC>S1?
+               richiede le informazioni del parametro S1
+   
+  Questo meccanismo usando due solo caratteri (oltre l'ESC) abilita 
+  alla selezione di 21 gruppi di comandi (A-Z) ognuno con 32 comandi , 
+  Qualunque carattere non ammesso azzera la sequenza di ESC.
+
+  Per evitare situazioni di blocco dovuto a sequenze incomplete e' stato 
+  inserito un timeout che si avvia alla ricezione del caratter ESC e verifica
+  che la sequenza si chiuda con il terzo carattere entro breve tempo.
+ 
+  
+  *-------------------------------------*
+  * elenco primi caratteri gia definiti *
+  *-------------------------------------*
+  - D = debug
+    abilita/disabilita varie opzioni di debug
+    - <ESC>D0..D9 
+    - <ESC>DA..DZ
+    
+  - T = comandi di test
+    comandi per test . codice specifico x test funzioni
+    - <ESC>T0..T9 
+    - <ESC>TA..TZ
+  
+  - P = comandi specifici player
+    comandi specifici dell'applicazione
+    - <ESC>PEC comandi specifici player EC
+    - <ESC>PKD comandi specifici player KD
+    - <ESC>PLK comandi specifici player LK
+    - <ESC>PGR comandi specifici player GR
+    - <ESC>PXL comandi specifici player XL
+    
+  - S = comandi di sistema
+    comandi per impostare il setup con accesso diretto ai parametri
+    - <ESC>S0..S9 
+    - <ESC>SA..SZ
+   
+  - L = chiamata funzioni di libreria LANZI
+    - <ESC>LC comandi Config
+    - <ESC>LA comandi Anagrafica
+    - <ESC>LB comandi Badge
+    - <ESC>LS comandi Server
+    - <ESC>LO comandi Offline
+    - <ESC>LV comandi Virtual_server
+    - <ESC>LT comandi Transazioni 
+    
+  - H = comandi gestione hardware
+    - <ESC>HB comandi Badge
+    - <ESC>HD comandi Display
+    - <ESC>HM comandi Motore
+    - <ESC>HI comandi Input_PLC
+    - <ESC>HO comandi Outpt_PLC
+    - <ESC>HC comandi CPU_core
+    - <ESC>HR comandi RTC
+    - <ESC>HS comandi SD
+    - <ESC>HE comandi EEPROM
+    -

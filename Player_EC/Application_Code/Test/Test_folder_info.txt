@@ -1,0 +1,14 @@
+  Questa cartella contiene del codice da testare non ancora validato per
+  essere inserito nelle specifiche cartelle.
+  A livello di applicazione vengono chiamate tre primitive :
+  - test_code_init()
+   gestisce inizializzazione codice di test
+
+  - test_code_main()
+   gestisce main del codice di test
+   
+  - serial_ESC_test()
+   gestisce sequenze di ESC di test
+   
+  Se questo codice non viene utilizzato le rispettive funzioni vanno lasciate vuote.
+  

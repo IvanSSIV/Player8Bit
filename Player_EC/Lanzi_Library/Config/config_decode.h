@@ -1,0 +1,1 @@
+void config_decode_line(char* read_line, CONFIG_DAT* set_ptr);

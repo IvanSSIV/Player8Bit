@@ -1,0 +1,34 @@
+Gestione_badge
+
+Contiene le API di interfaccia tra il modulo di gestione del badge ad alto
+livello delle librerie Lanzi e i driver a basso livello.
+
+Questo modulo costituisce i driver hardware per la gestione della lettura 
+del badge utilizzando la Serial2, ovvero una delle UART hardware dell'AtMega2560
+collegata al chip MAX232, che la converte in una seriale RS232.
+In questo modulo, quindi, si troveranno le funzioni necessarie 
+all'inizializzazione della seriale, alla verifica
+della presenza di dati in ingresso e all'acquisizione di tali dati, 
+al fine di utilizzare la stringa di numeri ricevuti come identificativo 
+dell'utente che intende utilizzare le funzioni della macchina.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-BOOL badge_char_available(void):
+ Funzione che controlla se ci sono caratteri da leggere sulla seriale Serial;
+ restituisce TRUE se è stato passato un badge, FALSE se non c'è nessun carattere
+ da leggere
+ 
+-uint16_t badge_read_char(void):
+ Se è presente un carattere da leggere sulla Serial2, restituisce quel carattere,
+ altrimenti restituisce 0xFFFF.
+ 
+-void badge_init_LL(uint32_t baud):
+ Funzione di inizializzazione a basso livello della seriale Serial, con baud rate
+ passato come parametro della funzione
+ 
+-void get_badge_info(char* msg, BOOL auth_vec[]):
+ Inserisce in un vettore di booleani le informazioni relative alle autorizzazioni
+ al prelievo per il badge da ogni singolo settore presente sulla macchina

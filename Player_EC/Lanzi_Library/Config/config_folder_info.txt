@@ -1,0 +1,34 @@
+In questo folder sono contenuti i moduli per la gestione del config.
+- config_def.h
+  Header contenente la definizione della struttura il config e la gestione del
+  config stesso
+
+- config_lib.cpp , config_lib.h
+  Modulo base della libreria per la gestione del config
+
+- config_logicFSM.cpp , config_logicFSM.h
+  Moduli che occupano di interfacciarsi con la macchina a stati principale per
+  leggere e caricare in memoria il config da LAN,SD,o EEPROM  
+
+- config_logicFSM.txt
+  testo con descizione funzionamento modulo
+
+- config_decode.cpp , config_decode.h
+  Moduli che effettuano la decodifica dei singoli menbri del config come
+  ricevuti da LAN o SD
+
+- config_write.cpp , config_write.h
+  Modulo che occupa di interfacciarsi tra il gestore del server e gli
+  strati inferiori per salvare il config.
+  Si appoggia su "config_API" per scrivere il file.
+
+- config_read.cpp , config_read.h
+  Modulo che si occupa li leggere e caricare in memoria un file config.
+  Si appoggia su "config_API" per leggere il file.
+
+- config_API.cpp , config_API.h
+  Strato intermedio tra "config_write" e"config_read" ,e le API a basso livello per
+  gestire la redirezione della scittura sulla SD con le librerie di Arduino
+
+- config_utils.cpp , config_utils.h
+  Modulo con utility varie per la gestione del config

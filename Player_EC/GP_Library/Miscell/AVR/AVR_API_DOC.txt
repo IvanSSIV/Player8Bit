@@ -1,0 +1,17 @@
+My_Library/Utilities/AVR_API
+
+Questo modulo contiene funzioni che rendono platform-independent il codice che sfrutta caratteristiche intrinseche dell'architettura AVR.
+Ad esempio, la funzione per prelevare una stringa di testo dalla Program Memory viene eseguita in due modi differenti. Queste modalità
+di esecuzione vengono discriminate da una definizione globale; se il codice viene compilato per una piattaforma AVR, viene eseguita
+una funzione specifica per prelevare la stringa dalla Program Memory, mentre se la piattaforma è una qualsiasi altra architettura,
+la funzione è differente.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-char* strncpy_AVR_PGM(char* _dest, const char* _src, size_t _size):
+ Versione platform-independent della strncpy_AVR_PGM
+ 
+-char* AVR_PGM_to_str(const char* string):
+ Funzione di conversione da stringa di Program Memory a stringa "normale" del C

@@ -1,0 +1,46 @@
+My_Library/RTC_template
+
+Questo modulo serve a generare una struttura di dati per la gestione di data e ora.
+Come gli altri template, il codice di questo modulo è ad alto livello, per cui non interagisce direttamente con il chip.
+Invece, effettua chiamate a funzioni che gestiscono il codice a basso livello dell'RTC in questione, ed elabora i dati affinchè
+possano essere utilizati dal codice applicazione.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void leggi_data_ora_da_RTC(void):
+ Legge e memorizza in una variabile globale la data e ora correnti; viene richiamata
+ dal main principale ad ogni cambio di secondo
+ 
+-void RTC_ena_print(void):
+ Attiva la stampa di data e ora sulla seriale di debug
+ 
+-void RTC_dis_print(void):
+ Disattiva la stampa di data e ora sulla seriale di debug
+ 
+-void get_datetime_ASCII(char* date_time, uint8_t date_size):
+ Legge la data e ora corrente nel formato ASCII
+ 
+-void get_datetime_ASCII_filedat(char* date_time, uint8_t date_size):
+ Legge la data e ora corrente nel formato necessario a intitolare i file .DAT
+ 
+-void get_datetime_ASCII_Lanzi(char* date_time, uint8_t date_size):
+ Legge la data e ora corrente nel formato Lanzi (stringa di cifre ricevuta dal server)
+ 
+-BOOL set_data_ora_da_server(char* data_ora_server):
+ Imposta la data e l'ora su quelle ricevute dalla RICHIESTA_PCtime inviata al server;
+ interpreta la stringa di cifre ricevuta e restituisce TRUE se i parametri ricevuti
+ come risposta sono congrui.
+ 
+-static BOOL convert_ASCII_to_DWORD(char* dato_ASCII, DWORD* dato_DW):
+ Converte la data da formato ASCII a doppia word
+ 
+-static void convert_datetime_long_to_HMSDMY(DWORD t, RTC_WORK *dt_out):
+ Converte dal formato "Lanzi" ad una struttura di tipo RTC_WORK
+ 
+-static void datetime_to_ASCII_LANZI(RTC_WORK* dataora, char* dataora_ASCII):
+ Converte la data e l'ora nel formato ASCII utilizzato dal server Lanzi
+
+-void RTC_print(RTC_WORK* dataora):
+ Stampa data e ora sulla seriale di debug

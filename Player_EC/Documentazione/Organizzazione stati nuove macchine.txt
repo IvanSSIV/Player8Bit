@@ -1,0 +1,76 @@
+//-- stati di inizializzazione e configurazione macchina
+	ST_LOGIC_INIT = 0,                        // Stato di inizializzazione
+	ST_LOGIC_FILL_STATUS,                     // gestisce i file apertura,chiusura,anagrafica.dat
+	ST_LOGIC_READ_CONFIG,                     // legge config da (LAN o SD o EEPROM)
+	ST_LOGIC_READ_ANAG,                       // legge anagrafica da (LAN o SD o EEPROM)
+	ST_LOGIC_PCTIME,                          // legge l'ora dal server
+	ST_LOGIC_SEND_OFFLINE,					  // Richiesta PCTime e invio eventuali file offline
+	
+	//-------------------------------------------------------------------------------------------//
+//-- stati operativi	
+	ST_LOGIC_MAIN,							  // Stato di decisioni operative delle macchina
+	ST_LOGIC_FIND_ZERO                        // Ricerca dello zero dell'asse del tamburo per le macchine che lo richiedono
+	ST_LOGIC_BADGE,							  // Lettura del badge
+	ST_LOGIC_HAND_ONLINE,				      // Gestione autorizzazioni online
+	ST_LOGIC_HAND_OFFLINE,					  // Gestione autorizzazioni offline
+	ST_LOGIC_EROG,						      // Erogazione dei tappi -- stato fortemente dipendente dall'applicazione
+	ST_LOGIC_RICHIESTA_AUTORIZZAZIONE,		  // Richiesta autorizzazione al prelievo
+	
+	//-------------------------------------------------------------------------------------------//
+//-- stati di errore
+	ST_LOGIC_INIT_ERROR                       // Uno degli stati di inizializzazione ha fallito
+	ST_LOGIC_ERROR,							  // Errore nella logica in runtime
+	ST_LOGIC_FAIL							  // Failure non recuperabile (da hardware)
+	
+	
+	
+	- ST_LOGIC_INIT
+	  Effettua:
+		-Test stato LAN (setta informazione globale dello stato LAN); se trova connessione, notifica l'accensione al server
+		-Inizializzazione variabili globali
+		-Inizializzazione macchine a stati secondarie
+	 
+		
+	-ST_LOGIC_FILL_STATUS
+	 Ricostruisce lo stato di occupazione delle celle per le macchine dotate di un'architettura a celle e settori.
+	 L'informazione viene recuperata dall'ultimo file di ricarica in ordine cronologico, il cui nome è indicato all'ultima riga popolata del file
+	 "RICARICA.DAT". Si occupa inoltre di creare i file APERTURA, CHIUSURA, RICARICA nel caso in cui non esistano. In alcune implementazioni (Player 32)
+	 il recupero della situazione di occupazione delle celle avviene da struttura memorizzata in EEPROM. Al termine delle attività di questo stato,
+	 viene settato un flag globale che indica fill_status_ok. Se TRUE, le informazioni di ricarica sono valide, in caso contrario le informazioni non sono attendibili.
+	 
+	-ST_LOGIC_READ_CONFIG
+	 Carica in memoria -in un'apposita struttura di tipo CONFIG- la condizione attuale di configurazione della macchina, ricavandola da:
+	     -Se c'è connessione di LAN, la configurazione viene richiesta al server
+		 -Se manca la connessione, viene verificata l'integrità dei dati presenti nel file "CONFIG.DAT" sulla scheda microSD
+		 -In caso di corruzione dei dati su SD, il file CONFIG viene ripristinato dalla EEPROM
+		 -In caso di corruzione anche di questa, viene impedito il funzionamento della macchina. 
+		 
+	 Questo stato setta alcuni flag globali, e precisamente:
+		 -config_OK: Indica che almeno uno dei CONFIG è stato letto correttamente
+		 -config_LAN_OK: Indica che il CONFIG ottenuto dal server è corretto.
+		 -config_SD_OK: Indica che il CONFIG all'interno della SD è corretto.
+		 -config_EEPROM_OK: Indica che il CONFIG all'interno della EEPROM è corretto.
+		 
+	In caso di scaricamento del CONFIG dalla LAN, vengono sincronizzati i dati presenti sulla SD e sulla EEPROM. 
+	
+	-ST_LOGIC_READ_ANAG
+	 In caso di presenza di connessione LAN, l'anagrafica viene scaricata dal server e salvata sull'apposito file "ANAG.DAT".
+	 In caso contrario, viene verificata la presenza e l'integrità del file "ANAG.DAT".
+	 Nelle macchine dove HW lo consente (32 bit) l'anagrafica viene caricata all'interno di un vettore in RAM.
+	 In funzione dell'esito dei test sopra citati, viene settato un flag globale "anag_OK". Nel caso in cui non si riesca ad ottenere l'anagrafica in nessun modo,
+	 viene impedito il funzionamento della macchina.
+	 
+	-ST_LOGIC_PCTIME
+	 In caso di connessione LAN, sincronizza l'ora dell'orologio locale con quella del server. In caso di assenza di connessione, non esegue nessuna azione.
+	 Tipicamente, questa richiesta viene eseguita ogni 60 s.
+	 
+	-ST_LOGIC_SEND_OFFLINE
+	 Viene tipicamente richiamato dopo ogni chiamata alla PCTIME. Verifica se nella SD sono presenti eventuali file offline, e in caso affermativo provvede ad inviarli
+	 al server e a cancellarli previa conferma di ricezione. Nel caso in cui fallisca la procedura di invio dei file offline, i file non vengono cancellati e viene effettuato
+	 nuovamente un tentativo alla prima richiesta di PCTIME che riscontri la presenza della connessione LAN.
+	 
+	-ST_LOGIC_MAIN
+	 Arriva in questo stato al boot dopo l'esecuzione degli stati di configurazione (LAN, CONFIG, etc).
+	 In questo stato, le variabili globali contengono gli esiti di tutte le operazioni di configurazione, e le strutture globali sono state popolate con le informazioni necessarie.
+	 In funzione dei flag sopra indicati, vengono prese le decisioni sulla operatività o meno della macchina. In caso di esito positivo, la macchina passa nelle fasi operative. In caso contrario,
+	 passa in uno stato ST_LOGIC_INIT_ERROR.

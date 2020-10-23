@@ -1,0 +1,29 @@
+Gestione_IO
+
+Questo modulo rappresenta i driver a basso livello per l'utilizzo dei GPIO del microcontrollore.
+Inizialmente, la gestione era stata costruita utilizzando le API di Arduino "digitalRead" e "digitalWrite", ma per ridurre la richiesta di
+risorse e il tempo necessario all'attuazione, è stata implementata la gestione dei GPIO tramite la manipolazione dei registri relativi alle
+porte del microcontrollore.
+In questo modo, il codice risulta meno portabile fra le varie piattaforme Arduino, ma allo stesso tempo l'astrazione utilizzata creando delle API
+specifiche a questo firmware permette -modificando alcune righe di codice- di adattare lo strato di driver ad un eventuale migrazione su un
+altro dispositivo.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void GPIO_init(void):
+ Inizializza i data direction register dei pin del microcontrollore
+ 
+-void PLC_read_input(PLC_WORK* plc):
+ Legge tramite primitive HW dependent gli ingressi del microcontrollore e popola
+ la struttura dell'immagine di processo
+ 
+-void PLC_write_output(PLC_WORK *plc):
+ Legge dalla struttura dell'immagine di processo del PLC e attua le uscite tramite
+ primitive HW dependent. NB: Per compatibilità con la mappatura della scheda, si è
+ deciso di non utilizzare il vettore Y[0]
+ 
+-void PLC_print_state(BOOL ena, PLC_WORK * plc):
+ Stampa su seriale lo stato di ingressi e uscite del PLC
+ 

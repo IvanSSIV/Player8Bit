@@ -1,0 +1,12 @@
+  Contiene il codice specifico per ogni modello di player
+  All'interno sono contenuti i seguenti folder
+  - EC 
+    contiene il codice specifico per il player EC
+  - GR 
+    contiene il codice specifico per il player GR
+  - KD 
+    contiene il codice specifico per il player KD
+  - LK 
+    contiene il codice specifico per il player LK
+  - XL 
+    contiene il codice specifico per il player EC

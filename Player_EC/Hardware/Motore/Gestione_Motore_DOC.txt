@@ -1,0 +1,23 @@
+Gestione_Motore
+
+Il modulo di gestione motore si compone del codice a basso livello per l'attuazione dei GPIO relativi alla movimentazione del motore.
+Nel caso specifico di questo firmware, il motore non necessita di controlli di posizionamento, per cui vengono incluse nel modulo le funzioni di avvio
+e arresto del motore, e la funzione di lettura di un valore analogico riconducibile all'assorbimento di corrente del motore durante il suo
+funzionamento.
+
+Nel caso invece di un motore dove sia necessario un controllo asse più approfondito, in questo modulo verranno aggiunte le funzioni di
+verifica del posizionamento, ed un eventuale interfaccia con una scheda esterna controllo assi in grado di utilizzare un encoder rotativo
+in quadratura per implementare un protocollo PID.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void LL_motor_init(void):
+ Inizializzazione a basso livello dell'output per il controllo del motore
+ 
+-void motor_START(void):
+ Accensione del motore
+ 
+-void motor_STOP(void):
+ Spegnimento del motore

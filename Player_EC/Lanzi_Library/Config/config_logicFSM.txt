@@ -1,0 +1,22 @@
+La lettura del config avviene da tre fonti :
+- LAN
+- SD
+- EEPROM
+
+La lettura del CONFIG avviene secondo la seguente priorita :                                                            
+ - se e' presenta la connessione LAN viene scaricato dal server        
+ - in caso alternativo viene caricato dalla SD                         
+ - in caso il config su SD sia alterato viene ricuperato dalla EEPROM 
+Se nessuno in nessuno dei tre casi si e' trovato un config valido     
+la macchina va in blocco e passa in una condizione di errore non recuperabile.                   
+
+- lettura da LAN
+Utilizza una FSM dedicata che lavora in modo monostabile "one-shot".
+La macchina e' normalmente in uno stato "INIT" in cui e' ferma e non fa
+nulla. La "init" in questo caso può essere paragonato al costruttore
+della classe C++ o C#.
+Quando si vuole compiere l'attivita richiesta si richiama la
+funzione "start" che avvia le operazioni. Al termine delle operazioni
+la FSM si trova o in stato OK o in ERROR a seconda dell'esito.
+Dopo una lettura rimane indefinitamente in questo stato.
+Se si vuole fare una nuova lettura basta richiamare la "start"

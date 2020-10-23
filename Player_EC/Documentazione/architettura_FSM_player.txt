@@ -1,0 +1,56 @@
+Organizzazione FSM macchine LANZI V1.01 (11-09-2020)
+----------------------------------------------------
+Qualunque macchina LANZI ha una organizzazione basata su delle FSM di livello
+superiore inserite a livello del main dell'applicazione .
+Le FSM usate sono :
+- FSM_logica
+  Gestisce la logica di funzionamento della macchina e svolge un ruolo di
+  abilitazione e coordinamento delle altre.Questa FSM ha una struttura
+  nidificato con ulteriori sotto FSM che implementano i dettagli del sottostato.
+  Le FSM dei sottostati si appoggiano a loro volta a servizi contenuti nelle
+  Lanzi_libray che implementano una ulteriore FSM . In vari stati si arriva
+  ad un livello di tre FSM nidificate.
+
+- FSM_erog
+  E' una FSM satellita della FSM_logica che si occupa della gestione dei
+  dettagli a basso livello della erogazione dei prodotti. E' la parte piu'
+  castomizzata di ogni player. 
+
+- FSM_server
+  Gestisce le operazioni di interrogazione del server e di elaborazione delle
+  risposte . Concettualmente puo' essere visto all'interno della applicazione
+  come un server locale che esegue dei servizi e restituice dei risultati.
+
+- FSM_badge
+  Gestisce la lettura del badge,i controlli preliminari e segnala alla FSM
+  principale la disponibilita di un nuovo badge
+
+- FSM_display
+  Si occupa di presentare dei messaggi sul display , astraendo la gestione 
+  dal tipo di display utilizzato . La FSM_logica non gestisce direttamente
+  il display ma invia una "richiesta di visualizzazione" alla FSM_display
+
+- FSM_storage
+  Si occupa di leggere e scrivere le informazioni su un supporto di 
+  memorizzazione esterno (tipicamente SD).
+
+- FSM_motor
+  Si occupa delle operazioni di gestione del motore e del relativo encoder
+  per effettuare le movimentazioni del distributore rotante . E' implementata
+  solo su alcuni Player (es : XL)
+  
+Le FSM sono inserite sequenzialmente una dopo l'altra nel loop principale
+ma a livello funzionale sono indipendenti e lavorano in parallelo.
+Questo consente una gestione "pseudo-multitask" anche su architetture
+che per natura non supportano il vero "multitask" (Free-RTOS).
+Nei limiti dei servizi sottostanti non sono bloccanti. 
+Gli unici "colli di bottiglia" per avevre un sistema completamente 
+"deterministico" sono rappresentati dalle librerie Arduino usate 
+dalle FSM "server" e "storage".
+
+L'archietettura a FSM sopra indicata consente concettualmente allocare i 
+servizi della "FSM_server","FSM_badge","FSM_dispaly","FSM_storage" su 
+unita di elaborazione esterne connesse via seriale.
+
+ 
+  

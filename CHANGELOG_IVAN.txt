@@ -1,0 +1,5 @@
+16/10/2020-----------------------------------------------------------------------------------------------------------------------
+-Aggiornata la funzione global_data_init() nel modulo "global_var.cpp" per inizializzare la variabile "global_data.machine_id"
+ in funzione del tipo di macchina definito in "project_def.h"
+-Aggiornato il file "project_def.h" per definire numero settori e piatti in funzione del tipo di macchina
+-Aggiornato il file "Player_EC.h" per l'inclusione delle librerie di erogazione in funzione del tipo di macchina

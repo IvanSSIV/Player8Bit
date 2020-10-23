@@ -1,0 +1,12 @@
+Gestione Seriali
+
+Questo driver permette il controllo a basso livello della Serial hardware dell'AtMega2560.
+Contiene quindi l'API di Arduino necessaria alla sua inizializzazione.
+Il baud rate utilizzato per questa applicazione è 115200.
+
+/*****************************************************************************/
+/*                                FUNZIONI                                   */
+/*****************************************************************************/
+
+-void serial_init(void):
+ Inizializzazione tramite l'API di Arduino "begin" della seriale per il debug
