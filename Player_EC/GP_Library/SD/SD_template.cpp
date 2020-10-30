@@ -36,13 +36,15 @@ const char str_file_ANAG[] PROGMEM     = { "ANAG.DAT" };
 const char str_file_APERTURA[] PROGMEM = { "APERTURA.DAT" };
 const char str_file_CHIUSURA[] PROGMEM = { "CHIUSURA.DAT" };
 const char str_file_RICARICA[] PROGMEM = { "RICARICA.DAT" };
+const char str_file_ANAGCN[] PROGMEM   = { "ANAGCN.DAT" };
 
 const char* const SD_file_name[] PROGMEM = {
 	str_file_CONFIG,
 	str_file_ANAG,
 	str_file_APERTURA,
 	str_file_CHIUSURA,
-	str_file_RICARICA
+	str_file_RICARICA,
+	str_file_ANAGCN
 };
 
 /**************************************************/

@@ -1,9 +1,9 @@
 /*****************************************************************************************************/
-#ifdef MODULE_APPL_EROG
-#define _EXTVAR /**/
-#else
-#define _EXTVAR extern
-#endif
+  #ifdef MODULE_APPL_EROG
+  #define _EXTVAR /**/
+  #else
+  #define _EXTVAR extern
+  #endif
 
 #define MOTOR_TEST_DELAY     3000L      // Millisecondi per i quali il motore rimane acceso durante la fase di test
 #define DELIVER_TIMEOUT     30000L		// Timeout per la consegna dei tappi

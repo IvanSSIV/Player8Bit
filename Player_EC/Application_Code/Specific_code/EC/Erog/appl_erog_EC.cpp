@@ -241,6 +241,7 @@ void erog_hand(void)
         case ST_EROG_WAITING_T1:
           fsm_first_scan(&FSM_Deliver, AVR_PGM_to_str(str_erog_st_waiting_t1));
           // e se sono != 1 che facciamo ?
+          // IDS: hai ragione, non ci avevo pensato! Ci vorrebbe uno switch che controlla il numero dei tappi
           if (app_globdata.tappi == 1)
             {               
                fsm_set_state(&FSM_Deliver, ST_EROG_WAITING_T2);

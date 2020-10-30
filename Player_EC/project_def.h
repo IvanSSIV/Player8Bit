@@ -8,7 +8,7 @@
 /*									    */
 /*									    */
 /****************************************************************************/
-#define MACHINE_TYPE ARGO_EC
+#define MACHINE_TYPE ARGO_LK
 
 
 //#define APPLICATION_MODE_CLASSIC
@@ -70,3 +70,4 @@
 #define NOME_FILE_APERTURA   (char *)"APERTURA.DAT"
 #define NOME_FILE_CHIUSURA   (char *)"CHIUSURA.DAT"
 #define NOME_FILE_RICARICA   (char *)"RICARICA.DAT"
+#define NOME_FILE_ANAGCN     (char *)"ANAGCN.DAT"

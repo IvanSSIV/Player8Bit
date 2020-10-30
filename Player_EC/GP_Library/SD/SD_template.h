@@ -28,7 +28,8 @@ enum SD_files {
 	FILE_ANAG,
 	FILE_APERTURA,
 	FILE_CHIUSURA,
-	FILE_RICARICA
+	FILE_RICARICA,
+	FILE_ANAGCN
 };
 
 // Struttura per salvataggio dati macchina

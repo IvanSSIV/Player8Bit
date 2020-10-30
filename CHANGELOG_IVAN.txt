@@ -3,3 +3,9 @@
  in funzione del tipo di macchina definito in "project_def.h"
 -Aggiornato il file "project_def.h" per definire numero settori e piatti in funzione del tipo di macchina
 -Aggiornato il file "Player_EC.h" per l'inclusione delle librerie di erogazione in funzione del tipo di macchina
+
+30/10/2020-----------------------------------------------------------------------------------------------------------------------
+-Iniziata la stesura dell'application_erog per LK
+-Iniziata la stesura della funzione speciale per LK "anagcn", dove viene scaricata l'anagrafica dei badge abilitati sul distributore
+ corredata da nome e cognome associati al badge
+-Iniziata la stesura del modulo "LK MAPPING" per la mappatura degli sportelli da server su Argo LK Pro

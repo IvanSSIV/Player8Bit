@@ -11,3 +11,4 @@ const char str_log_offline_tag[] PROGMEM = { "[OFFLIN]" };
 const char str_log_virtser_tag[] PROGMEM = { "[VSERV.]" };
 const char str_log_storage_tag[] PROGMEM = { "[STORA.]" };
 const char str_log_transaz_tag[] PROGMEM = { "[TRANS.]" };
+const char str_log_anagcn_tag[]  PROGMEM = { "[ANGCN.]" };
