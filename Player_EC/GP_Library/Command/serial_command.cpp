@@ -1,12 +1,14 @@
 #define MODULE_SERIAL_COMMAND
 
 // include comuni in libreria "GP_library"
-#include "..\GP_library.h"
-#include "Application_Code/Test/serial_command_test.h"
+#include "../GP_library.h"
+#include "../../Application_Code/Test/serial_command_test.h"
+#include "../../Lanzi_Library/Command/serial_command_LANZI.h"
+
 // definizione variabili locali
 static ESC_HAND_STATE ESC_stat;        // stato sequenza di ESC
-static uint8_t        ESC_first_char;  // primo carattere dopo ESC
-static uint8_t        ESC_second_char; // secondo carattere dopo ESC
+static uint8_t        ESC_prev_char;   // primo carattere dopo ESC
+//static uint8_t        ESC_second_char; // secondo carattere dopo ESC
 static uint32_t       ESC_timeout;     // timeout chiusura sequenza
 
 
@@ -32,11 +34,11 @@ void serial_ESC_command(void)
             if (c == 0x1B)
               {
                  ESC_timeout = RTOS_get_tick_1ms();
-                 ESC_stat = ST_ESC_FIRST;
+                 ESC_stat = ST_ESC_CH1;
               }
             break;
 
-          case ST_ESC_FIRST:
+          case ST_ESC_CH1:
             c = serial_ESC_read_char();
             if (c != 0)
               {
@@ -48,8 +50,8 @@ void serial_ESC_command(void)
                       case 'L': // coamndi libreria LANZI
                       case 'S': // comandi di sistema
                       case 'H': // comandi hardware
-                        ESC_first_char = c;
-                        ESC_stat = ST_ESC_SECOND;
+                        ESC_prev_char = c;
+                        ESC_stat = ST_ESC_CH2;
                         break;
                       default:
                         ESC_stat = ST_ESC_WAIT;
@@ -57,11 +59,11 @@ void serial_ESC_command(void)
               }
             break;
 
-          case ST_ESC_SECOND:
+          case ST_ESC_CH2:
             c = serial_ESC_read_char();
             if (c != 0)
               {
-                 switch (ESC_first_char)
+                 switch (ESC_prev_char)
                    {
                       case 'P': // comandi specifici player
                         done = serial_ESC_player(c);
@@ -72,8 +74,8 @@ void serial_ESC_command(void)
                       case 'T': // comandi test
                         done = serial_ESC_test(c);  
                         break;
-                      case 'L': // library command
-                        done = serial_ESC_LANZI(c);
+                      case 'L': // library Lanzi
+                        done = serial_ESC_LANZI(c,&ESC_stat);
                         break;
                       case 'S': // impostazioni di sistema
                         done = serial_ESC_system(c);
@@ -85,6 +87,23 @@ void serial_ESC_command(void)
                    }
               }
             break;
+
+          case ST_ESC_CH3:
+            c = serial_ESC_read_char();
+            if (c != 0)
+              {
+                 switch (ESC_prev_char)
+                   {
+                      case 'L':  // library Lanzi
+                        done = serial_ESC_LANZI(c,&ESC_stat); 
+                        break;
+                   }
+              }
+            break;
+
+          case ST_ESC_CH4:
+            break;
+
        }
 
      // gestione timeout chiusura sequenza

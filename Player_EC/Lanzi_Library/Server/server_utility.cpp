@@ -101,24 +101,34 @@ void server_utility_init(void)
 /* function server_set_connection_param()         */
 /* Preleva dal config i parametri di connessione  */
 /*------------------------------------------------*/
+//#define TEST_SERVER 
 void server_set_connection_param(void)
   {
      MY_IP_ADDR serv_IP;
      char buff[80];
 
      //serv_IP = config_get_serv_IP();
+     #ifdef TEST_SERVER
+     serv_IP.oct1 = 193;
+     serv_IP.oct2 = 204;
+     serv_IP.oct3 = 114;
+     serv_IP.oct4 = 232;
+
+     //port = config_get_serv_port();
+     port = 123; // 1443
+     #else
      serv_IP.oct1 = 212;
      serv_IP.oct2 = 112;
      serv_IP.oct3 = 86;
      serv_IP.oct4 = 16;
+
+     //port = config_get_serv_port();
+     port = 1443; // 1443
+     #endif
      SERVER[0] = serv_IP.oct1;
      SERVER[1] = serv_IP.oct2;
      SERVER[2] = serv_IP.oct3;
      SERVER[3] = serv_IP.oct4;
-
-     //port = config_get_serv_port();
-     port = 1443; // 1443
-
      sprintf(buff,
              AVR_PGM_to_str(str_impostazioni),
              SERVER[0], SERVER[1], SERVER[2], SERVER[3], port);
@@ -146,8 +156,18 @@ BOOL server_LAN_connection(void)
         
      retval = FALSE;
      debug_message_ident_push();
+     //client.stop();
      for (retry = 1; retry <= SERVER_OPEN_MAX_RETRY; retry++)
        {
+          char buff[80];
+          sprintf(buff,
+                  "server:%03u-%03u-%03u-%03u port:%04u",
+                  SERVER[0],
+                  SERVER[1],
+                  SERVER[2],
+                  SERVER[3],
+                  port);
+          debug_message_timestamp(buff);
           server_work.open_ms_start = millis();
           open_connect_retval = client.connect(SERVER, port);
           server_work.open_ms_end = millis();
@@ -179,7 +199,7 @@ BOOL server_LAN_connection(void)
             }
           else
             {
-               delay(100);
+               delay(1000);
             }
         }
      debug_message_ident_pop();
@@ -373,7 +393,7 @@ uint8_t server_read_answer(char *answer,uint16_t answ_size)
                  config_save_end(server_work.rx_line);
               }
             // se siamo in lettura anagrafica chiudi la ricezione
-            if (server_work.usr_msg_id = SRV_MSGID_ANAG)
+            if (server_work.usr_msg_id == SRV_MSGID_ANAG)
               {
                  anag_save_end(server_work.rx_line);
               }
@@ -645,7 +665,7 @@ static void server_visualizza_dati_ricevuti(BOOL ena, uint8_t ident, char* buff,
 // Modificare per prelevare i dati dalla struttura CONFIG globale
 static void get_config_numero_PC(char* name, uint8_t size)
   {
-     strncpy(name, "20300", size - 1);
+     strncpy(name, "55555", size - 1);
      strncat(name, "_", size - 1);
      name[size - 1] = 0;
   }
@@ -874,10 +894,8 @@ void server_close(void)
 /* Compone il messaggio per la trasmissione    */
 /* al server.                                  */
 /*---------------------------------------------*/
-
-
 void server_transmit(void)
-{
+  {
         char buff[100];
 
         // prepara il messaggio completo
@@ -925,13 +943,13 @@ void Ethernet_print_info(void)
         sprintf(buff, "IP Macchina: %03d.%03d.%03d.%03d", IP[0], IP[1], IP[2], IP[3]);
         debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L2, buff);
         memset(buff, 0, sizeof(buff));
-        sprintf(buff, "IP Server: %03d.%03d.%03d.%03d", SERVER[0], SERVER[1], SERVER[2], SERVER[3]);
+        sprintf(buff, "IP Server : %03d.%03d.%03d.%03d", SERVER[0], SERVER[1], SERVER[2], SERVER[3]);
         debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L2, buff);
         memset(buff, 0, sizeof(buff));
-        sprintf(buff, "Porta: %05d", port);
+        sprintf(buff, "Porta    : %05d", port);
         debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L2, buff);
         memset(buff, 0, sizeof(buff));
-        sprintf(buff, "Gateway: %03d.%03d.%03d.%03d", GW[0], GW[1], GW[2], GW[3]);
+        sprintf(buff, "Gateway  : %03d.%03d.%03d.%03d", GW[0], GW[1], GW[2], GW[3]);
         debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L2, buff);
         memset(buff, 0, sizeof(buff));
         sprintf(buff, "DNS: %03d.%03d.%03d.%03d", DNS[0], DNS[1], DNS[2], DNS[3]);
@@ -940,7 +958,7 @@ void Ethernet_print_info(void)
         sprintf(buff, "Subnet mask: %03d.%03d.%03d.%03d", SM[0], SM[1], SM[2], SM[3]);
         debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L2, buff);
         debug_print_timestamp(srv_dbg, AVR_PGM_to_str(str_eth_info_end));
-}
+  }
 
 
 char * serv_ID_to_str(SRV_MSG_ID ID)

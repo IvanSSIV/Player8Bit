@@ -36,7 +36,7 @@
 // include in cartella "Common"
 #include "./Common/Lanzi_tag.h"
 
-// include in cartella "Commad"
+// include in cartella "Command"
 #include "./Command/serial_command_LANZI.h"
 
 // include in cartella "Storage"

@@ -38,8 +38,8 @@ const char str_srv_answ_data_err[] PROGMEM     = { "dati risposta errati" };
 const char str_srv_sys_err[] PROGMEM           = { "errore di sistema " };
 const char str_srv_invalid_msgid[] PROGMEM     = { "id messaggio non supportato" };
 const char str_srv_impossible[] PROGMEM        = { "impossibile che succeda ...." };
-const char str_srv_msg_in_carico[] PROGMEM     = { " *** messaggio preso in carico ***" };
-const char str_srv_msg_non_accodato[] PROGMEM  = { " *** messaggio non accodato ***" };
+const char str_srv_msg_in_carico[] PROGMEM     = { "*** messaggio preso in carico ***" };
+const char str_srv_msg_non_accodato[] PROGMEM  = { "*** messaggio non accodato ***" };
 
 const char str_srv_st_init[] PROGMEM           = { "SRV_ST_INIT" };
 const char str_srv_st_idle[] PROGMEM           = { "SRV_ST_IDLE" };
@@ -107,6 +107,8 @@ extern BOOL verifica_congruita_config_ricevuto(void);
 /*****************************************************/
 void server_init(void)
   {    
+     srv_dbg = TRUE;
+
      debug_message_enable(TRUE,2);
      debug_message_CRLF();
      debug_message_timestamp_PGM(str_server_init_start);
@@ -164,32 +166,28 @@ void server_reset_error(void)
 /*****************************************************************/
 BOOL server_request_send(server_msg_id prm_msg_id, char* usr_parameter)
   {
-     uint8_t event;
      BOOL retval;
      retval = FALSE;
 
      // nome funzione
-     #ifdef DEBUG_VERSION
-     debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L1, AVR_PGM_to_str(str_srv_request_send));
-     #endif
+     debug_message_timestamp_PGM(str_srv_request_send);
 
      // info ID e evento
-     #ifdef DEBUG_VERSION
      char buff[50];
      char loc_param[10];
      if (strlen(usr_parameter) == 0)
        strncpy(loc_param, "none", sizeof(loc_param) - 1);
      else
        strncpy(loc_param, usr_parameter, sizeof(loc_param) - 1);
-     sprintf(buff, " [ id=%s prm=%s ] ", serv_ID_to_str(prm_msg_id), loc_param);
-     debug_print_ena(srv_dbg, buff);
-     #endif
+     sprintf(buff, " [ id=%s  prm=%s ] ", serv_ID_to_str(prm_msg_id), loc_param);
+     debug_message_timestamp(buff);
 
      // verifica che non vi siano attivita pendenti
-     if (last_server_event == SRV_EV_NONE)
+     if (server_work.usr_msg_id == SRV_MSGID_NONE)
        {
-          last_server_event = event;
-          switch (prm_msg_id)
+          // memorizza ID del messaggio da inviare
+          server_work.usr_msg_id = prm_msg_id;
+          switch (server_work.usr_msg_id)
             {
                // Servizi che non prevedono risposta
                case SRV_MSGID_ACCESA:
@@ -198,7 +196,7 @@ BOOL server_request_send(server_msg_id prm_msg_id, char* usr_parameter)
                case SRV_MSGID_RELOAD:
                case SRV_MSGID_REFILL:
                case SRV_MSGID_RICARICATO:
-                 event = SRV_EV_SEND_ONLY;
+                 server_work.usr_msg_type = SRV_EV_SEND_ONLY;
                  break;
                // Servizi per cui è necessaria una risposta dal server
                case SRV_MSGID_ANAG:
@@ -212,36 +210,27 @@ BOOL server_request_send(server_msg_id prm_msg_id, char* usr_parameter)
                case SRV_MSGID_RESO:
                case SRV_MSGID_ANNULLATO:
                case SRV_MSGID_SEND_OFFLINE:
-                 event = SRV_EV_SEND_AND_WAIT;
+                 server_work.usr_msg_type = SRV_EV_SEND_AND_WAIT;
                  break;
                default:
-                 event = SRV_EV_NONE;
+                 server_work.usr_msg_type = SRV_EV_NONE;
             }
-          if (event != SRV_EV_NONE)
+          if (server_work.usr_msg_type != SRV_EV_NONE)
             {
-               // memorizza ID del messaggio inviato
-               server_work.usr_msg_id = prm_msg_id;
                strncpy(usr_message_payload, usr_parameter, SERVER_MAX_MESSAGE);
 
-               #ifdef DEBUG_VERSION
-               debug_print_timestamp_ident(srv_dbg,DEBUG_IDENT_L1, AVR_PGM_to_str(str_srv_msg_in_carico));
-               #endif
+               debug_message_timestamp_PGM(str_srv_msg_in_carico);
                retval = TRUE;
             }
           else
             {
-               #ifdef DEBUG_VERSION
-               debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L1, AVR_PGM_to_str(str_srv_msg_non_accodato));
-               #endif
-
+               debug_message_timestamp_PGM(str_srv_msg_non_accodato);
                retval = FALSE;
             }
        }
      else
        {
-          #ifdef DEBUG_VERSION
-          debug_print_ena(srv_dbg, AVR_PGM_to_str(str_srv_msg_non_accodato));
-          #endif
+          debug_message_timestamp_PGM(str_srv_msg_non_accodato);
           retval = FALSE;
        }
 
@@ -353,65 +342,74 @@ void server_request_hand(void)
             fsm_set_state(&Server_FSM, SRV_ST_IDLE);
             break;
 
-          // attesa arrivo eventi
+          // attesa arrivo richieste servizi
           case SRV_ST_IDLE:
             if (fsm_first_scan(&Server_FSM, AVR_PGM_to_str(str_srv_st_idle)))
               {
               }
-            switch (last_server_event)
+            if (server_work.usr_msg_id != SRV_MSGID_NONE)
               {
-                 // invio senza risposta
-                 case SRV_EV_SEND_ONLY:
-                   fsm_set_state(&Server_FSM, SRV_ST_SENDING_ONLY);
-                   break;
-                 // invio con rispsoat
-                 case SRV_EV_SEND_AND_WAIT:
-                   fsm_set_state(&Server_FSM, SRV_ST_SENDING);
-                   break;
-              } 
+                 switch (server_work.usr_msg_type)
+                   {
+                      // invio senza risposta
+                      case SRV_EV_SEND_ONLY:
+                        fsm_set_state(&Server_FSM, SRV_ST_SENDING_ONLY);
+                        break;
+                      // invio con rispoasta
+                      case SRV_EV_SEND_AND_WAIT:
+                        fsm_set_state(&Server_FSM, SRV_ST_SENDING);
+                        break;
+                      default:
+                        server_work.usr_msg_id = SRV_MSGID_NONE;
+                        server_work.usr_msg_type = SRV_EV_NONE;
+                    } 
+              }
             break;
 
+          // gestione servizi di invio messaggi senza risposta
           case SRV_ST_SENDING_ONLY:
             if (fsm_first_scan(&Server_FSM, AVR_PGM_to_str(str_srv_st_sending_only)))
               {
                  ;
               }
+            // Invia il messaggio al server
+            // In uscita restituisce TRUE se l'invio e andato a buon fine 
+            // (verifica se la server_open e' riuscita)
+            // Effettua una open,una write e una close.
             if (server_invia_messaggio_senza_risposta())
               {
-                 #ifdef DEBUG_VERSION
-                 debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L1, AVR_PGM_to_str(str_srv_send_OK));
-                 #endif
+                 debug_message_timestamp_PGM(str_srv_send_OK);
               }
             else
               {
-                 #ifdef DEBUG_VERSION
-                 debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L1, AVR_PGM_to_str(str_srv_send_KO));
-                 #endif     
+                 debug_message_timestamp_PGM(str_srv_send_KO);
               }
-            last_server_event = SRV_EV_NONE;
+            // cancella rirchiesta pendente
+            server_work.usr_msg_id = SRV_MSGID_NONE;
+            server_work.usr_msg_type = SRV_EV_NONE;
             fsm_set_state(&Server_FSM, SRV_ST_IDLE);
             break;
 
+          // gestione servizi di invio messaggi con risposta
           case SRV_ST_SENDING:
             if (fsm_first_scan(&Server_FSM, AVR_PGM_to_str(str_srv_st_sending)))
               {
                  ;
               }
+            // Invia il messaggio al server
+            // In uscita restituisce TRUE se l'invio e andato a buon fine 
+            // (verifica se la server_open e' riuscita)
+            // Effettua una open,una write ma lascia la connessione aperta
             if (server_invia_messaggio_con_risposta())
               {
-                 #ifdef DEBUG_VERSION
-                 debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L1, AVR_PGM_to_str(str_srv_send_OK));
-                 #endif     
+                 debug_message_timestamp_PGM(str_srv_send_OK);
               }
             else
-               {
-                  #ifdef DEBUG_VERSION
-                  debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L1, AVR_PGM_to_str(str_srv_send_KO));
-                  #endif          
-               }
-               last_server_event = SRV_EV_NONE;
-               fsm_set_state(&Server_FSM, SRV_ST_WAITING_ANSW);
-               break;
+              {
+                 debug_message_timestamp_PGM(str_srv_send_KO);
+              }
+            fsm_set_state(&Server_FSM, SRV_ST_WAITING_ANSW);
+            break;
 
           // stiamo attendendo la risposta dal server
           case SRV_ST_WAITING_ANSW:
@@ -432,11 +430,9 @@ void server_request_hand(void)
                       // #PAYLOAD_STR ...... #PAYLOAD_END
                       case FSM_DONE:
                         //server_first = TRUE;                         
-                        #ifdef DEBUG_VERSION
                         char buff[150];
                         sprintf(buff, "risposta server = %s", server_answer);
-                        debug_print_timestamp_ident(srv_dbg, DEBUG_IDENT_L1, buff);
-                        #endif
+                        debug_message_timestamp(buff);
 
                         //debug_print_timestamp_ident(TRUE, DEBUG_IDENT_L1, "imposto data_ora :");
 
@@ -444,6 +440,8 @@ void server_request_hand(void)
                         // verifica che la risposta non sia "INVALID COMMAND"
                         if (Server_check_answer(server_work.usr_msg_id, server_answer))
                           {
+                             sprintf(buff,"msg_id:%02X",server_work.usr_msg_id);
+                             debug_message_timestamp(buff);
                              // seleziono e gestisco i vari casi della risposta
                              server_answer_code esito = Server_decode_answer(server_work.usr_msg_id, server_answer);
 
@@ -487,13 +485,19 @@ void server_request_hand(void)
             // Aggiungere contatore comandi eseguiti
             if (fsm_first_scan(&Server_FSM, AVR_PGM_to_str(str_srv_st_done)))
               {
+                 // cancella rirchiesta pendente
+                 server_work.usr_msg_id = SRV_MSGID_NONE;
+                 server_work.usr_msg_type = SRV_EV_NONE;
                  // attiva ritardo richiesta successiva      
                  fsm_set_timer(&Server_FSM, FSM_TIMER1, SRV_DONE_DELAY);
               }
-            // tempo di attesa dopo comando OK
-            if (fsm_check_end_time(&Server_FSM, FSM_TIMER1))
+            else
               {
-                 fsm_set_state(&Server_FSM, SRV_ST_IDLE);
+                // tempo di attesa dopo comando OK
+                if (fsm_check_end_time(&Server_FSM, FSM_TIMER1))
+                  {
+                     fsm_set_state(&Server_FSM, SRV_ST_IDLE);
+                  }
               }
             break;
 
@@ -501,6 +505,9 @@ void server_request_hand(void)
             // Aggiungere contatore errori sui comandi
             if (fsm_first_scan(&Server_FSM, AVR_PGM_to_str(str_srv_st_error)))
               {
+                 // cancella rirchiesta pendente
+                 server_work.usr_msg_id = SRV_MSGID_NONE;
+                 server_work.usr_msg_type = SRV_EV_NONE;
                  // attiva ritardo richiesta successiva      
                  fsm_set_timer(&Server_FSM, FSM_TIMER1, SRV_ERROR_DELAY);
               }
@@ -518,6 +525,9 @@ void server_request_hand(void)
             // Aggiungere contatore errori sui comandi
             if (fsm_first_scan(&Server_FSM, AVR_PGM_to_str(str_srv_st_timeout)))
               {
+                 // cancella rirchiesta pendente
+                 server_work.usr_msg_id = SRV_MSGID_NONE;
+                 server_work.usr_msg_type = SRV_EV_NONE;
                  // attiva ritardo richiesta successiva      
                  fsm_set_timer(&Server_FSM, FSM_TIMER1, SRV_ERROR_DELAY);
               }
@@ -538,7 +548,7 @@ void server_request_hand(void)
           default:
                ;
      }
-}
+  }
 
 //===================================================================================================================//
 

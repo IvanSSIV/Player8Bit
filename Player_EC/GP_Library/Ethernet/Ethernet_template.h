@@ -12,7 +12,7 @@
 void Ethernet_init(void);												// Inizializza a basso livello il modulo W5100
 void Ethernet_mantain_lease(void);										// Rinnova il lease DHCP
 void Ethernet_build_message(char* dest, uint8_t index, char* message);	// Costruisce il messaggio da mandare al server
-
+void Ethernet_print_address(void);
 
 // Define mnemoniche per i messaggi ricevuti dal server
 #define SRV_ANSW_OK1							0

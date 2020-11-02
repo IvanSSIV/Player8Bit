@@ -56,7 +56,7 @@ void appl_init(void)
      RTC_init_LL();
 
      // Inizializza la scheda SD
-     // SD_init();
+     SD_init();
      
      // inizializza gestione PLC e logica macchina
      //appl_test_PLC_init();

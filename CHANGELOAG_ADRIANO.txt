@@ -23,3 +23,13 @@
 - creato e testato gestore comandi specifico per EC
   con test delle API per avvire e fermare Erog
 - creati prototipi funzione gestori specifici per Lanzi
+
+*------------*
+* 01/11/2020 *
+*------------*
+- iniziato debug nuova gestione server, sistemato problemi vari
+- modificata gestione stato INIT della FSM principale
+- inseririto codice per test passaggio stati MAIN,READ_BADGE,
+  in FSM principale
+- testata funzione richiesta PCTIME
+

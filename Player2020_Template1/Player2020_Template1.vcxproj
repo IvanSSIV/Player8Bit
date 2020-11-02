@@ -1,0 +1,189 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{aad7f8e8-7d70-47c0-816a-6db9e255e640}</ProjectGuid>
+    <RootNamespace>Player2020_Template1</RootNamespace>
+    <ProjectName>Player_Template</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>
+    </PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>
+    </PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>
+    </PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>
+    </PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Player_Template;C:\Users\ivan.destefani\Documents\Arduino\arduino-1.8.3\hardware\arduino\avr\cores\arduino;C:\Users\ivan.destefani\Documents\Arduino\arduino-1.8.3\hardware\arduino\avr\variants\mega;C:\Users\ivan.destefani\Documents\Arduino\arduino-1.8.3\hardware\tools\avr\\lib\gcc\avr\7.3.0\include;C:\Users\ivan.destefani\Documents\Arduino\arduino-1.8.3\hardware\tools\avr\avr\include;C:\Users\ivan.destefani\Documents\Arduino\arduino-1.8.3\hardware\tools\avr\\lib\gcc\avr\7.3.0\include;C:\Users\ivan.destefani\Documents\Arduino\arduino-1.8.3\hardware\tools\avr\avr\include-fixed;C:\Users\ivan.destefani\Documents\Arduino\arduino-1.8.3\hardware\tools\avr\avr\include\avr;C:\Users\ivan.destefani\Documents\Arduino\arduino-1.8.3\hardware\tools\avr\lib\gcc\avr\4.8.1\include;C:\Users\ivan.destefani\Documents\Arduino\arduino-1.8.3\hardware\tools\avr\lib\gcc\avr\4.9.2\include;C:\Users\ivan.destefani\Documents\Arduino\arduino-1.8.3\hardware\tools\avr\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>$(ProjectDir)__vm\.Player_Template.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
+      <PreprocessorDefinitions>__AVR_atmega2560__;__AVR_ATmega2560__;F_CPU=16000000L;ARDUINO=10803;ARDUINO_AVR_MEGA2560;ARDUINO_ARCH_AVR;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="VisualMicro" />
+  </ItemGroup>
+  <PropertyGroup>
+    <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="Player_Template.ino">
+      <FileType>CppCode</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Application_Code\Application_Erog\appl_badge.h" />
+    <ClInclude Include="Application_Code\Application_Erog\appl_erog.h" />
+    <ClInclude Include="Application_Code\Application_Init\appl_init.h" />
+    <ClInclude Include="Application_Code\Application_Logica\appl_logica.h" />
+    <ClInclude Include="Application_Code\Application_Main\appl_main.h" />
+    <ClInclude Include="Application_Code\Application_Motor\appl_motor.h" />
+    <ClInclude Include="Application_Code\Application_Server\appl_server.h" />
+    <ClInclude Include="Application_Code\Application_Server\server_utility.h" />
+    <ClInclude Include="Application_Code\Application_Utility\appl_utility.h" />
+    <ClInclude Include="debug_opzion.h" />
+    <ClInclude Include="Hardware\Badge\gestione_badge.h" />
+    <ClInclude Include="Hardware\CPU_core\timing.h" />
+    <ClInclude Include="Hardware\Gestione_display\gestione_LCD.h" />
+    <ClInclude Include="Hardware\Gestione_IO\gestione_io.h" />
+    <ClInclude Include="Hardware\Gestione_IO\GPIO_define_mod.h" />
+    <ClInclude Include="Hardware\Gestione_motore\gestione_motore_nodenti.h" />
+    <ClInclude Include="Hardware\Gestione_RTC\gestione_RTC.h" />
+    <ClInclude Include="Hardware\Gestione_seriali\serial_init.h" />
+    <ClInclude Include="Hardware\Special\hi_speed_input.h" />
+    <ClInclude Include="IO_mapping.h" />
+    <ClInclude Include="My_Debug\Debug_Serial\debug_serial.h" />
+    <ClInclude Include="My_Debug\Debug_Utility\debug_utility.h" />
+    <ClInclude Include="My_Include\global_define.h" />
+    <ClInclude Include="My_Include\mydef.h" />
+    <ClInclude Include="My_Include\my_time.h" />
+    <ClInclude Include="My_Library\Connessione\Ethernet_template.h" />
+    <ClInclude Include="My_Library\EEPROM\EEPROM_template.h" />
+    <ClInclude Include="My_Library\FSM\FSM_template.h" />
+    <ClInclude Include="My_Library\LCD\LCD_template.h" />
+    <ClInclude Include="My_Library\PLC\PLC_define.h" />
+    <ClInclude Include="My_Library\RTC\RTC_template.h" />
+    <ClInclude Include="My_Library\SD\config_define.h" />
+    <ClInclude Include="My_Library\SD\SD_template.h" />
+    <ClInclude Include="My_Library\Utilities\AVR_API.h" />
+    <ClInclude Include="player_header.h" />
+    <ClInclude Include="project_def.h" />
+    <ClInclude Include="__vm\.Player_Template.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Application_Code\Application_Erog\appl_badge.cpp" />
+    <ClCompile Include="Application_Code\Application_Erog\appl_erog.cpp" />
+    <ClCompile Include="Application_Code\Application_Init\appl_init.cpp" />
+    <ClCompile Include="Application_Code\Application_Logica\appl_logica.cpp" />
+    <ClCompile Include="Application_Code\Application_Main\appl_main.cpp" />
+    <ClCompile Include="Application_Code\Application_Motor\appl_motor.cpp" />
+    <ClCompile Include="Application_Code\Application_Server\appl_server.cpp" />
+    <ClCompile Include="Application_Code\Application_Server\server_utility.cpp" />
+    <ClCompile Include="Application_Code\Application_Utility\appl_utility.cpp" />
+    <ClCompile Include="Hardware\Badge\gestione_badge.cpp" />
+    <ClCompile Include="Hardware\CPU_core\timing.cpp" />
+    <ClCompile Include="Hardware\Gestione_display\gestione_LCD.cpp" />
+    <ClCompile Include="Hardware\Gestione_IO\gestione_io.cpp" />
+    <ClCompile Include="Hardware\Gestione_motore\gestione_motore_nodenti.cpp" />
+    <ClCompile Include="Hardware\Gestione_RTC\gestione_RTC.cpp" />
+    <ClCompile Include="Hardware\Gestione_seriali\serial_init.cpp" />
+    <ClCompile Include="Hardware\Special\hi_speed_input.cpp" />
+    <ClCompile Include="My_Debug\Debug_Serial\debug_serial.cpp" />
+    <ClCompile Include="My_Debug\Debug_Utility\debug_utility.cpp" />
+    <ClCompile Include="My_Library\Connessione\Ethernet_template.cpp" />
+    <ClCompile Include="My_Library\EEPROM\EEPROM_template.cpp" />
+    <ClCompile Include="My_Library\FSM\FSM_template.cpp" />
+    <ClCompile Include="My_Library\LCD\LCD_template.cpp" />
+    <ClCompile Include="My_Library\RTC\RTC_template.cpp" />
+    <ClCompile Include="My_Library\SD\SD_template.cpp" />
+    <ClCompile Include="My_Library\Utilities\AVR_API.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties config.Debug.customdebug_mega_atmega2560_debugger_type="universal" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

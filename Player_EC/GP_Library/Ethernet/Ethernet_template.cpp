@@ -11,33 +11,13 @@
 // include comuni in libreria "GP_library"
 #include "../GP_library.h"
 
-// Include delle librerie
-// Include librerie W5100
-/*#include "SPI.h"
-#include <Ethernet.h>
-#include <utility/w5100.h>
-#include "Arduino.h"
-#include "IPAddress.h"
-
-#include "project_def.h"
-#include "debug_opzion.h"
-
-#include "My_Include/mydef.h"
-
-#include "My_Debug/Debug_Serial/debug_serial.h"
-#include "My_Debug/Debug_Utility/debug_utility.h"
-#include "My_Debug/Serial_Command/serial_command.h"
-#include "My_Library/Utilities/AVR_API.h"
-#include "Hardware/CPU_core/timing.h"
-
-#include "Ethernet_template.h"*/
 
 IPAddress IP(0, 0, 0, 0);                     // IP della macchina
 IPAddress SM(0, 0, 0, 0);                     // Maschera di sottorete
 IPAddress GW(0, 0, 0, 0);                     // Gateway
 IPAddress DNS(0, 0, 0, 0);                     // DNS
 byte MAC[] = { 0x1E, 0x20, 0x1E, 0x1F, 0x24, 0x20 };  // Mac address della scheda
-BOOL DHCP = FALSE;                                                  // Flag che indica se la macchina è connessa in DHCP oppure con IP statico
+BOOL DHCP = FALSE;                                    // Flag che indica se la macchina è connessa in DHCP oppure con IP statico
 
 // Stringhe costanti per stampa debug su seriale
 const char str_dbg_w5100_init_start[] PROGMEM    = { "- Inizializzo Wiznet W5100 -" };
@@ -46,7 +26,15 @@ const char str_dbg_w5100_connect_fixip[] PROGMEM = { "Connetto con IP statico ..
 const char str_dbg_w51000_MAC_address[] PROGMEM  = { "MAC Address       : %02X-%02X-%02X-%02X-%02X-%02X" };
 const char str_dbg_w5100_connect_DHCP[] PROGMEM  = { "Connetto con DHCP ..." };
 const char str_dbg_w5100_tempo_conne[] PROGMEM   = { "Tempo connessione : %06lu" };
-const char str_dbg_w5100_indirizzo_acq[] PROGMEM = { "Indirizzo IP acq. : %03d.%03d.%03d.%03d" };
+const char str_dbg_w5100_indirizzo_IP[] PROGMEM  = { "Indirizzo IP : %03d.%03d.%03d.%03d" };
+const char str_dbg_w5100_subnet_mask[] PROGMEM   = { "SubNetMask   : %03d.%03d.%03d.%03d" };
+const char str_dbg_w5100_gateway[] PROGMEM       = { "Gateway      : %03d.%03d.%03d.%03d" };
+const char str_dbg_w5100_DNSserver[] PROGMEM     = { "DNS_server   : %03d.%03d.%03d.%03d" };
+
+//          DNS = Ethernet.dnsServerIP();
+//          GW = Ethernet.gatewayIP();
+//          SM = Ethernet.subnetMask();
+
 //     sprintf(buff2,"%03d.%03d.%03d.%03d", IP[0], IP[1], IP[2], IP[3]);
 //     debug_print_timestamp_title(DBG_ALWAYS_ON, 3, (char*)"Indirizzo IP acquisito : ", buff2);
 const char str_dbg_w5100_mantain_DHCP[] PROGMEM  = { "DHCP Renew: " };
@@ -203,10 +191,6 @@ void Ethernet_init(void)
           sprintf(buff, AVR_PGM_to_str(str_dbg_w5100_tempo_conne), connect_time);
           debug_message_timestamp(buff);
 
-          sprintf(buff,AVR_PGM_to_str(str_dbg_w5100_indirizzo_acq), IP[0], IP[1], IP[2], IP[3]);
-          debug_message_timestamp(buff);
-
-
           debug_message_ident_pop();
        }
      else
@@ -220,6 +204,8 @@ void Ethernet_init(void)
           connect_time = end_ms - start_ms;
        }
 
+     // visualizza configurazione indirizzi IP
+     Ethernet_print_address();
 
      // Numero di ritrasmissioni della comunicazione e intervallo fra di esse (3 tentativi ad 1 s l'uno dall'altro)
      W5100.setRetransmissionTime(1000);
@@ -227,6 +213,28 @@ void Ethernet_init(void)
 
      debug_message_ident_pop();
      debug_message_timestamp_PGM(str_dbg_w5100_init_end);
+  }
+
+//const char str_dbg_w5100_indirizzo_IP[] PROGMEM  = { "Indirizzo IP : %03d.%03d.%03d.%03d" };
+//const char str_dbg_w5100_subnet_mask[] PROGMEM   = { "SubNetMask   : %03d.%03d.%03d.%03d" };
+//const char str_dbg_w5100_gateway[] PROGMEM       = { "Gateway      : %03d.%03d.%03d.%03d" };
+//const char str_dbg_w5100_DNSserver[] PROGMEM     = { "DNS_server   : %03d.%03d.%03d.%03d" };
+
+void Ethernet_print_address(void) 
+  {
+     char buff[80];
+
+     sprintf(buff,AVR_PGM_to_str(str_dbg_w5100_indirizzo_IP),IP[0], IP[1], IP[2], IP[3]);
+     debug_message_timestamp(buff);
+
+     sprintf(buff,AVR_PGM_to_str(str_dbg_w5100_subnet_mask),SM[0], SM[1], SM[2], SM[3]);
+     debug_message_timestamp(buff);
+
+     sprintf(buff,AVR_PGM_to_str(str_dbg_w5100_gateway), GW[0], GW[1], GW[2], GW[3]);
+     debug_message_timestamp(buff);
+
+     sprintf(buff,AVR_PGM_to_str(str_dbg_w5100_DNSserver), DNS[0], DNS[1], DNS[2], DNS[3]);
+     debug_message_timestamp(buff);
   }
 
 /*************************************************/

@@ -13,6 +13,19 @@
 
 // definizioni locali
 
+// enumerazione sotto stati dello stato "LOGIC_INIT"
+enum logic_init_substate
+  {
+     ST_INIT_INIT = 0,        // condizione iniziale
+     ST_INIT_CHECK_CONN,      // test connessione
+     ST_INIT_WAIT_SERVICE,    // attesa completamento servizi
+     ST_INIT_ACCESA,          // invia messaggio "ACCESA"
+     ST_INIT_PCTIME,          // invia richiesta "PCTIME"
+     ST_INIT_OK,              // inizializzazione OK
+     ST_INIT_ERROR            // errore inizializzazione
+};
+typedef logic_init_substate LOGIC_INIT_SUBSTAT;
+
 // enumerazione sotto stati dello stato "LOGIC_READ_CONFIG"
 enum logic_read_config_substate
   {
@@ -135,6 +148,7 @@ void logic_init(void)
 void logic_main(void)
   {
      FSM_RETVAL esito_stato;
+
      switch (FSM_Logica.state)
        {
           // effetta le inzializzazionei globali e 
@@ -149,7 +163,10 @@ void logic_main(void)
                    break;   
                  // termine regolare
                  case FSM_DONE:
-                   fsm_set_state(&FSM_Logica, ST_LOGIC_READ_CONFIG); 
+                   // modifica temporanea in fase di debug
+                   // poi ripristinare
+                   fsm_set_state(&FSM_Logica, ST_LOGIC_MAIN); 
+                   //fsm_set_state(&FSM_Logica, ST_LOGIC_READ_CONFIG); 
                    break;
 
                  // la "INIT" restituisce FAIL se c'e un problema HW
@@ -248,13 +265,20 @@ void logic_main(void)
             esito_stato = hand_ST_LOGIC_PCTIME();
             switch (esito_stato)
               {
+                 case FSM_EXEC:
+                   break;
                  // indipendentemente dall'esito passa allo stato successivo
                  case FSM_DONE:
                  case FSM_ERROR:
                    fsm_set_state(&FSM_Logica, ST_LOGIC_SEND_OFFLINE);
                    break;
                  case FSM_FAIL:
-                 default: 
+                   fsm_set_state(&FSM_Logica, ST_LOGIC_FAIL);
+                   break;
+                 default:  
+                   // gestione safe dei casi non previsti
+                   global_data.FSM_fail_code = FAIL_LOGIC_INT_ERROR;
+                   fsm_set_state(&FSM_Logica, ST_LOGIC_FAIL);
                    break;
               }
             break;
@@ -264,25 +288,42 @@ void logic_main(void)
             esito_stato = hand_ST_LOGIC_SEND_OFFLINE();
             switch (esito_stato)
               {
+                 case FSM_EXEC:
+                   break;
                  case FSM_DONE:
+                   fsm_set_state(&FSM_Logica, ST_LOGIC_MAIN);
                    break;
                  case FSM_ERROR:
                    break;
                  case FSM_FAIL:
-                 default:
+                   fsm_set_state(&FSM_Logica, ST_LOGIC_FAIL);
+                   break;
+                 default:  
+                   // gestione safe dei casi non previsti
+                   global_data.FSM_fail_code = FAIL_LOGIC_INT_ERROR;
+                   fsm_set_state(&FSM_Logica, ST_LOGIC_FAIL);
                    break;
               }
             break;
 
+          // Gestisce le decisioni sulle operazioni da compiere
+          // in funzione di eventuali condizioni di errori
+          // Viene richiamata dopo una accensione o dopo ogni 
+          // lettura del PC_time e operazioni annesse
           case ST_LOGIC_MAIN:
             esito_stato = hand_ST_LOGIC_MAIN();
             switch (esito_stato)
               {
                  case FSM_DONE:
+                   fsm_set_state(&FSM_Logica, ST_LOGIC_BADGE);
                    break;
                  case FSM_ERROR:
                    break;
+                 case FSM_EXEC:
+                   break;
                  case FSM_FAIL:
+                   fsm_set_state(&FSM_Logica, ST_LOGIC_FAIL);
+                   break;
                  default:  
                    // gestione safe dei casi non previsti
                    global_data.FSM_fail_code = FAIL_LOGIC_INT_ERROR;
@@ -300,6 +341,8 @@ void logic_main(void)
                  case FSM_DONE:
                  case FSM_ERROR:
                  case FSM_FAIL:
+                   fsm_set_state(&FSM_Logica, ST_LOGIC_FAIL);
+                   break;
                  default: 
                    // gestione safe in caso di richiamo accidentale
                    global_data.FSM_fail_code = FAIL_LOGIC_INT_ERROR;
@@ -308,17 +351,50 @@ void logic_main(void)
               }
             break;
 
+          // Gestisce l'attesa del passaggio badge
+          // Esce per avvenuta lettura badge o scaduto tempo per richiesta di PCtime
           case ST_LOGIC_BADGE:
             esito_stato = hand_ST_LOGIC_BADGE();
             switch (esito_stato)
               {
+                 case FSM_EXEC:
+                   break;
                  case FSM_DONE:
+                   // vedi se avvenuta lettura barcode
+                   if (global_data.flg_barcode_read)
+                     {
+                        main_logic_state new_stat;
+                        if (global_data.flg_LAN_OK)
+                          {
+                             new_stat = ST_LOGIC_HAND_ONLINE;
+                          }
+                        else
+                          {
+                             new_stat = ST_LOGIC_HAND_OFFLINE;
+                          }
+                        // modifica temporanea (da eliminare)
+                        new_stat = ST_LOGIC_BADGE;
+                        // seleziona opportuno stato in funzione della 
+                        // condizione di connessione attiva o meno
+                        fsm_set_state(&FSM_Logica, new_stat);
+                     }
+                   // vedi se richiesta PCtime
+                   else if (global_data.flg_read_PCtime_req)
+                     {
+                        fsm_set_state(&FSM_Logica, ST_LOGIC_PCTIME);
+                     }
                    break;
                  case FSM_ERROR:
                    break;
-                 case FSM_FAIL:                 
+                 case FSM_FAIL:
+                   fsm_set_state(&FSM_Logica, ST_LOGIC_FAIL);
                    break;
-              }
+                 default: 
+                   // gestione safe in caso di richiamo accidentale
+                   global_data.FSM_fail_code = FAIL_LOGIC_INT_ERROR;
+                   fsm_set_state(&FSM_Logica, ST_LOGIC_FAIL);
+                   break;
+               }
             break;
 
           case ST_LOGIC_HAND_ONLINE:
@@ -426,9 +502,21 @@ void logic_main(void)
 /* - inizializza dati globali                                          */
 /* - invia il messaggo "ACCESA"                                        */
 /*---------------------------------------------------------------------*/
+// messaggi di debug dei sottostati dello stato "INIT"
+const char str_log_st_init_sub_INIT[]         PROGMEM = { "init->INIT" };
+const char str_log_st_init_sub_CHECK_CONN[]   PROGMEM = { "init->CHECK_CONN" };
+const char str_log_st_init_sub_WAIT_SERVICE[] PROGMEM = { "init->WAIT_SERVICE" };
+const char str_log_st_init_sub_ACCESA[]       PROGMEM = { "init->ACCESA" };
+const char str_log_st_init_sub_PCTIME[]       PROGMEM = { "init->PCTIME" };
+const char str_log_st_init_sub_OK[]           PROGMEM = { "init->OK" };
+const char str_log_st_init_sub_ERROR[]        PROGMEM = { "init->ERROR" };
 static FSM_RETVAL hand_ST_LOGIC_INIT(void)
   {
-     FSM_RETVAL retval;
+     static TINY_FSM init_FSM;
+     static FSM_RETVAL retval;
+     FSM_RETVAL esito;
+
+     debug_message_enable(TRUE,2);
 
      retval = FSM_NOT_INIT;
      // vedi se prima scansione nello stato
@@ -436,37 +524,142 @@ static FSM_RETVAL hand_ST_LOGIC_INIT(void)
        {
           // inserire qui eventuali notifiche su display
 
-          // verifica connessione
-          // nb: la "server_LAN_connection" da FALSE se la LAN e' in fail
-          if (server_LAN_connection())
-            {
-               global_data.flg_LAN_OK = TRUE; 
-               // avvio procedura per notificare accensione
-               // nb : essendo all'accensione si da per scontato 
-               //      che il gestore del server sia ready
-               // invio richiesta al gestore del server
-               server_request_send(SRV_MSGID_ACCESA, "");
-           }
-          else
-            {
-               // inserire eventuali inzializzazioni addizionali
-               // 
-               global_data.flg_LAN_OK = FALSE;
-            }     
+          FSMTINY_init(&init_FSM, ST_INIT_INIT);
+
        }
      else
        {
-          // vedi se avvenuti fail hw durante inizializzazione 
-          // a basso livello
-          if (global_data.LAN_hw_fail || 
-              global_data.SD_hw_fail || 
-              global_data.RTC_hw_fail)
+          switch (init_FSM.stat)
             {
-               retval = FSM_FAIL;
-            }
-          else
-            {
-               retval = FSM_DONE;
+               // condizione iniziale
+               case ST_INIT_INIT:
+                 if (FSMTINY_first(&init_FSM))
+                   {
+                      // visualizza info debug
+                      debug_message_timestamp_PGM(str_log_st_init_sub_INIT);
+                      // vedi se avvenuti fail hw durante inizializzazione 
+                      // a basso livello
+                      if (global_data.LAN_hw_fail || 
+                          global_data.SD_hw_fail || 
+                          global_data.RTC_hw_fail)
+                        {
+                           retval = FSM_FAIL;
+                        }
+                      else
+                        {
+                           FSMTINY_set_state(&init_FSM,ST_INIT_CHECK_CONN);
+                        } 
+                   }
+                 break;
+
+               // verifica la connessione   
+               case ST_INIT_CHECK_CONN:
+                 if (FSMTINY_first(&init_FSM))
+                   {
+                      // visualizza info debug
+                      debug_message_timestamp_PGM(str_log_st_init_sub_CHECK_CONN);
+                   }
+                 else
+                   {
+                      // verifica connessione
+                      // nb: la "server_LAN_connection" da FALSE se la LAN e' in fail
+                      if (server_LAN_connection())
+                        {
+                           global_data.flg_LAN_OK = TRUE; 
+                        }
+                      else
+                        {
+                           // inserire eventuali inzializzazioni addizionali
+                           // 
+                           global_data.flg_LAN_OK = FALSE;
+                        }     
+                      FSMTINY_set_state(&init_FSM,ST_INIT_WAIT_SERVICE);
+                   }
+                 break;
+
+               // verifica avvio FSM dei vari servizi 
+               case ST_INIT_WAIT_SERVICE:
+                 if (FSMTINY_first(&init_FSM))
+                   {
+                      // visualizza info debug
+                      debug_message_timestamp_PGM(str_log_st_init_sub_WAIT_SERVICE);
+                   }
+                 else
+                   {
+                      if (global_data.flg_LAN_OK)
+                        {
+                           FSMTINY_set_state(&init_FSM,ST_INIT_ACCESA);
+                        }
+                      else
+                        {
+                           FSMTINY_set_state(&init_FSM,ST_INIT_ACCESA);
+                        }
+                   }
+                 break;
+
+               case ST_INIT_ACCESA:
+                 if (FSMTINY_first(&init_FSM))
+                   {
+                      // visualizza info debug
+                      debug_message_timestamp_PGM(str_log_st_init_sub_ACCESA);
+                      // avvio procedura per notificare accensione
+                      // nb : essendo all'accensione si da per scontato 
+                      //      che il gestore del server sia ready
+                      // invio richiesta al gestore del server
+                      server_request_send(SRV_MSGID_ACCESA, "");
+                   }
+                 else
+                   {
+                      // verifico che il gestore del server sia pronto a eseguire
+                      // ovvero attendo il completamento del precedente comando
+                      esito = server_request_state();
+                      if (esito == FSM_READY)
+                        {
+                           FSMTINY_set_state(&init_FSM,ST_INIT_PCTIME);
+                        }
+                   }
+                 break;
+
+               case ST_INIT_PCTIME:
+                 if (FSMTINY_first(&init_FSM))
+                   {
+                      // visualizza info debug
+                      debug_message_timestamp_PGM(str_log_st_init_sub_PCTIME);
+                      // invia la richiesta di PCtime
+                      server_request_send(SRV_MSGID_PCTIME, "");
+                   }
+                 else
+                   {
+                      // verifico che il gestore del server sia pronto a eseguire
+                      // ovvero attendo il completamento del precedente comando
+                      esito = server_request_state();
+                      if (esito == FSM_READY)
+                        {
+                           FSMTINY_set_state(&init_FSM,ST_INIT_OK);
+                        }                      
+                   }
+                 break;
+
+               case ST_INIT_OK:
+                 if (FSMTINY_first(&init_FSM))
+                   {
+                      // visualizza info debug
+                      debug_message_timestamp_PGM(str_log_st_init_sub_OK);
+                   }
+                 retval = FSM_DONE;
+                 break;
+
+               case ST_INIT_ERROR:
+                 if (FSMTINY_first(&init_FSM))
+                   {
+                      // visualizza info debug
+                      debug_message_timestamp_PGM(str_log_st_init_sub_ERROR);
+                   }
+                 retval = FSM_ERROR;
+                 break;
+
+               default:
+                 retval = FSM_INVALID_STATE;
             }
        }
 
@@ -496,13 +689,6 @@ static FSM_RETVAL hand_ST_LOGIC_FILL_STATUS(void)
 
 
 //===========================================================================//
-// messaggi di debug dei sottostati dello stato "READ_CONFIG"
-const char str_log_st_readconf_sub_INIT[]       PROGMEM = { "read_config->INIT" };
-const char str_log_st_readconf_sub_GET_LAN[]    PROGMEM = { "read_config->GET FROM LAN" };
-const char str_log_st_readconf_sub_GET_SD[]     PROGMEM = { "read_config->GET FROM SD" };
-const char str_log_st_readconf_sub_GET_EEPROM[] PROGMEM = { "read_config->GET FROM EEPROM" };
-const char str_log_st_readconf_sub_DONE[]       PROGMEM = { "read_config->DONE" };
-const char str_log_st_readconf_sub_ERROR[]      PROGMEM = { "read_config->ERROR" };
 
 /*-----------------------------------------------------------------------*/
 /* function hand_ST_LOGIC_READ_CONFIG()                                  */
@@ -515,10 +701,18 @@ const char str_log_st_readconf_sub_ERROR[]      PROGMEM = { "read_config->ERROR"
 /* Se nessuno in nessuno dei tre casi si e' trovato un config valido     */
 /* la macchina va in blocco e passa in stato "---"                       */
 /*-----------------------------------------------------------------------*/
+// messaggi di debug dei sottostati dello stato "READ_CONFIG"
+const char str_log_st_readconf_sub_INIT[]       PROGMEM = { "read_config->INIT" };
+const char str_log_st_readconf_sub_GET_LAN[]    PROGMEM = { "read_config->GET FROM LAN" };
+const char str_log_st_readconf_sub_GET_SD[]     PROGMEM = { "read_config->GET FROM SD" };
+const char str_log_st_readconf_sub_GET_EEPROM[] PROGMEM = { "read_config->GET FROM EEPROM" };
+const char str_log_st_readconf_sub_DONE[]       PROGMEM = { "read_config->DONE" };
+const char str_log_st_readconf_sub_ERROR[]      PROGMEM = { "read_config->ERROR" };
+
 static FSM_RETVAL hand_ST_LOGIC_READ_CONFIG(void)
   {
      static TINY_FSM config_read_FSM;
-     static FSM_RETVAL retval;
+     FSM_RETVAL retval;
 
      retval = FSM_NOT_INIT;
      // vedi se primo giro nello stato
@@ -659,6 +853,12 @@ static FSM_RETVAL hand_ST_LOGIC_READ_CONFIG(void)
 
 
 //===========================================================================//
+
+/*----------------------------------------------------------*/
+/* function hand_ST_LOGIC_READ_ANAG()                       */
+/* Gestisce la lettura dell'anagrafica dei badge abilitati  */
+/* dal server o SD                                          */
+/*----------------------------------------------------------*/
 // messaggi di debug dei sottostati dello stato "READ_ANAG"
 const char str_log_st_readanag_sub_INIT[]       PROGMEM = { "read_anagr->INIT" };
 const char str_log_st_readanag_sub_GET_LAN[]    PROGMEM = { "read_anagr->GET FROM LAN" };
@@ -667,11 +867,6 @@ const char str_log_st_readanag_sub_GET_EEPROM[] PROGMEM = { "read_anagr->GET FRO
 const char str_log_st_readanag_sub_DONE[]       PROGMEM = { "read_anagr->DONE" };
 const char str_log_st_readanag_sub_ERROR[]      PROGMEM = { "read_anagr->ERROR" };
 
-/*----------------------------------------------------------*/
-/* function hand_ST_LOGIC_READ_ANAG()                       */
-/* Gestisce la lettura dell'anagrafica dei badge abilitati  */
-/* dal server o SD                                          */
-/*----------------------------------------------------------*/
 static FSM_RETVAL hand_ST_LOGIC_READ_ANAG(void)
   {
      static TINY_FSM anag_read_FSM;
@@ -750,96 +945,268 @@ static FSM_RETVAL hand_ST_LOGIC_READ_ANAG(void)
        }
   }
 
-// Richiesta di data e ora aggiornati al server, con cadenza ogni 60 s
+/*-------------------------------------------------------*/
+/* function hand_ST_LOGIC_PCTIME()                       */
+/* Richiesta di data e ora aggiornati al server          */
+/* con cadenza tipica di 60sec (programmabile da condig) */
+/*-------------------------------------------------------*/
+// enumerazione sotto stati dello stato "LOGIC_PCTIME"
+enum logic_pctime_substate
+  {
+     ST_PCTIME_INIT = 0,    // condizione iniziale
+     ST_PCTIME_WAIT_READY,  // attesa completamento servizi
+     ST_PCTIME_CHECK_CONN,  // test connessione
+     ST_PCTIME_SEND,        // invia richiesta "PCTIME"
+     ST_PCTIME_DONE,        // lettura OK
+     ST_PCTIME_ERROR        // errore lettura
+  };
+typedef logic_pctime_substate LOGIC_PCTIME_SUBSTAT;
+
+// messaggi di debug dei sottostati dello stato "READ_CONFIG"
+const char str_log_st_pctime_sub_INIT[]       PROGMEM = { "read_pctime->INIT" };
+const char str_log_st_pctime_sub_WAIT_READY[] PROGMEM = { "read_pctime->WAIT_READY" };
+const char str_log_st_pctime_sub_CHECK_CONN[] PROGMEM = { "read_pctime->CHECK_CONNN" };
+const char str_log_st_pctime_sub_SEND[]       PROGMEM = { "read_pctime->SEND" };
+const char str_log_st_pctime_sub_DONE[]       PROGMEM = { "read_pctime->DONE" };
+const char str_log_st_pctime_sub_ERROR[]      PROGMEM = { "read_pctime->ERROR" };
+
 static FSM_RETVAL hand_ST_LOGIC_PCTIME(void)
   {
-     
+     FSM_RETVAL retval;
+     static TINY_FSM PCTIME_read_FSM;
+     FSM_RETVAL esito;
+
+     retval = FSM_EXEC;
+     if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_pctime)))
+       {
+          FSMTINY_init(&PCTIME_read_FSM, ST_READ_ANAG_INIT);
+       }
+     else 
+       {
+          switch (PCTIME_read_FSM.stat)
+            {
+               // condizione iniziale
+               case ST_PCTIME_INIT:  
+                 if (FSMTINY_first(&PCTIME_read_FSM))
+                   {
+                      debug_message_timestamp_PGM(str_log_st_pctime_sub_INIT);
+                   }
+                 else
+                   {
+                      FSMTINY_set_state(&PCTIME_read_FSM,ST_PCTIME_WAIT_READY);
+                   }
+                 break;
+
+               // attesa completamento operazioni
+               case ST_PCTIME_WAIT_READY:
+                 if (FSMTINY_first(&PCTIME_read_FSM))
+                   {
+                      debug_message_timestamp_PGM(str_log_st_pctime_sub_WAIT_READY);
+                   }
+                 else
+                   {
+                      // verifico che il gestore del server sia pronto a eseguire
+                      // ovvero attendo il completamento del precedente comando
+                      esito = server_request_state();
+                      if (esito == FSM_READY)
+                        {
+                           FSMTINY_set_state(&PCTIME_read_FSM,ST_PCTIME_CHECK_CONN);
+                        }                      
+                   }
+                 break;
+
+               // test connessione LAN
+               case ST_PCTIME_CHECK_CONN:
+                 if (FSMTINY_first(&PCTIME_read_FSM))
+                   {
+                      debug_message_timestamp_PGM(str_log_st_pctime_sub_CHECK_CONN);
+                   }
+                 else
+                   {
+                      // verifica connessione
+                      // nb: la "server_LAN_connection" da FALSE se la LAN e' in fail
+                      if (server_LAN_connection())
+                        {
+                           global_data.flg_LAN_OK = TRUE; 
+                        }
+                      else
+                        {
+                           // inserire eventuali inzializzazioni addizionali
+                           // 
+                           global_data.flg_LAN_OK = FALSE;
+                        }     
+                      FSMTINY_set_state(&PCTIME_read_FSM,ST_PCTIME_SEND);
+                   }
+                 break;
+
+
+               // invia richiesta "PCTIME"
+               case ST_PCTIME_SEND:
+                 if (FSMTINY_first(&PCTIME_read_FSM))
+                   {
+                      debug_message_timestamp_PGM(str_log_st_pctime_sub_SEND);
+                      // invia la richiesta di PCtime
+                      server_request_send(SRV_MSGID_PCTIME, "");
+                   }
+                 else
+                   {
+                      esito = server_request_state();
+                      if (esito == FSM_READY)
+                        {
+                           FSMTINY_set_state(&PCTIME_read_FSM,ST_PCTIME_DONE);
+                        }                      
+                   }
+                 break;
+               // inizializzazione OK
+               case ST_PCTIME_DONE:
+                 if (FSMTINY_first(&PCTIME_read_FSM))
+                   {
+                      debug_message_timestamp_PGM(str_log_st_pctime_sub_DONE);
+                   }
+                 else
+                   {
+                      retval = FSM_DONE;
+                   }
+                 break;
+               // errore inizializzazione
+               case ST_PCTIME_ERROR:
+                 if (FSMTINY_first(&PCTIME_read_FSM))
+                   {
+                      debug_message_timestamp_PGM(str_log_st_pctime_sub_ERROR);
+                   }
+                 else
+                   {
+                      retval = FSM_ERROR;
+                   }
+                 break;
+            }
+         }
+     return retval;     
   }
 
 #define PCTIME_REQUEST_RATE 60000L
 
+/*-----------------------------------------------------------------*/
+/* function hand_ST_LOGIC_MAIN()                                   */
+/* Costituisce il punto centrale in cui vengono prese le decisioni */
+/* della macchina a stati principale                               */
+/*-----------------------------------------------------------------*/
 static FSM_RETVAL hand_ST_LOGIC_MAIN(void)
   {
-   static uint32_t PCtime_request_timer;
+     FSM_RETVAL retval;
 
-   if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_main)))
-     {
-       // leggi dal modulo "logic_init" l'esito delle attivita di caricamento di config e anag
-       //BOOL tmp;
-       //tmp = get_config_anag_status();
-      // appl_logic_data.flg_serv_config_OK = logic_get_config_status();
-       //appl_logic_data.flg_serv_anag_OK = logic_get_anag_status();
-       badge_ena_read();
-       PCtime_request_timer = RTOS_get_tick_1ms();
-     }
-   else // Operazioni effettuate in "loop" nel main di applicazione
-     {
-       // vedi se arrivato badge
-       if (badge_present())
-         {
-           //badge_get_last_reading(appl_logic_data.last_read_badge, sizeof(appl_logic_data.last_read_badge) - 1);
-           // inserire logica di gestione badge
-           // bla,bla,bla e se ok chiamo erog
-         }
-       // temporizzazione per lettura PC_time
-       if ((RTOS_get_tick_1ms() - PCtime_request_timer) >= PCTIME_REQUEST_RATE)
-         {
-            // funzione che legge il PCtime
-           // se OK chiamo la send_offline
-           PCtime_request_timer = RTOS_get_tick_1ms();
-         }
-     }
-}
+     retval = FSM_EXEC;
+     if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_main)))
+       {
+          // leggi dal modulo "logic_init" l'esito delle attivita di caricamento di config e anag
+          //BOOL tmp;
+          //tmp = get_config_anag_status();
+          // appl_logic_data.flg_serv_config_OK = logic_get_config_status();
+          //appl_logic_data.flg_serv_anag_OK = logic_get_anag_status();
+       }
+     else // Operazioni effettuate in "loop" nel main di applicazione
+       {
+          retval = FSM_DONE;
+       }
+     return retval;
+  }
 
 /************************************************************/
 /* Questa funzione viene chiamata solo dalle macchine che   */
 /* necessitano di un azzeramento della posizione (XL).      */
 /************************************************************/
-
 static FSM_RETVAL hand_ST_LOGIC_FIND_ZERO(void)
-{
+  {
+     return FSM_DONE;
+  }
 
-}
-
-// Invio dei file offline nel caso in cui siano presenti e venga verificata
-// la presenza della connessione LAN alla richiesta del PCTime
+/*-------------------------------------------------------*/
+/* function hand_ST_LOGIC_SEND_OFFLINE()                 */
+/* Invio dei file offline nel caso in cui siano presenti */
+/* e venga verificata la presenza della connessione LAN  */
+/* alla richiesta del PCTime                             */
+/*-------------------------------------------------------*/
 static FSM_RETVAL hand_ST_LOGIC_SEND_OFFLINE(void)
-{
-   if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_send_offline)))
-   {
+  {
+     FSM_RETVAL retval;
 
-   }
-}
+     retval = FSM_EXEC;
+     if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_send_offline)))
+       {
 
-// Gestione della lettura del badge
+       }
+     else
+       {
+          retval = FSM_DONE;
+       }
+     return retval;
+  }
 
+/*-------------------------------------------------------------------*/
+/* function hand_ST_LOGIC_MAIN()                                     */
+/* E' lo stato in cui il player e' in attesa del passaggio del badge */ 
+/* Esce da questo stato ad un passaggio del badge o se e' trascorso  */
+/* il tempo per la lettura del PCtime                                */
+/*-------------------------------------------------------------------*/
 static FSM_RETVAL hand_ST_LOGIC_BADGE(void)
-{
-   if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_badge)))
-   {
+  {
+     static uint32_t PCtime_request_timer;
+     FSM_RETVAL retval;
 
-   }
-}
+     retval = FSM_EXEC;
 
-// In caso di presenza di connessione al server, viene inviato il messaggio di richiesta autorizzazioni
-// al prelievo
+     if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_badge)))
+       {
+          badge_ena_read();
+          PCtime_request_timer = RTOS_get_tick_1ms();
+       }
+     else
+       {
+          // vedi se arrivato badge
+          if (badge_present())
+            {
+               global_data.flg_barcode_read = TRUE;
+               retval = FSM_DONE;
+            }
+         // temporizzazione per lettura PC_time
+         else if ((RTOS_get_tick_1ms() - PCtime_request_timer) >= PCTIME_REQUEST_RATE)
+           {
+              // funzione che legge il PCtime
+              global_data.flg_read_PCtime_req = TRUE;
+              retval = FSM_DONE;
+           }
+       }
+     return retval;
+  }
+
+/*-------------------------------------------------------------*/
+/* function hand_ST_LOGIC_HAND_ONLINE()                        */
+/* In caso di presenza di connessione al server, viene inviato */ 
+/* il messaggio di richiesta autorizzazioni al prelievo        */
+/* il tempo per la lettura del PCtime                          */
+/*-------------------------------------------------------------*/
 static FSM_RETVAL hand_ST_LOGIC_HAND_ONLINE(void)
-{
-   if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_hand_online)))
-   {
+  {
+     FSM_RETVAL retval;
 
-   }
-}
+     retval = FSM_EXEC;
+     if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_hand_online)))
+       {
+
+       }
+
+     return retval;
+  }
 
 // In caso di mancata connessione al server, vengono letti i file sulla SD per determinare
 // le autorizzazioni al prelievo da parte del badge scansionato
 static FSM_RETVAL hand_ST_LOGIC_HAND_OFFLINE(void)
-{
-   if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_hand_offline)))
-   {
+  {
+     if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_hand_offline)))
+       {
 
-   }
-}
+       }
+  }
 
 /**************************************************************/
 /* Porzione di codice che gestisce l'erogazione del prodotto; */
@@ -883,7 +1250,7 @@ static FSM_RETVAL hand_ST_LOGIC_ERROR(void)
 
 // Failure hardware di uno dei componenti della scheda
 static void hand_ST_LOGIC_FAIL(void)
-{
+  {
    if (fsm_first_scan(&FSM_Logica, AVR_PGM_to_str(str_log_st_fail)))
    {
 

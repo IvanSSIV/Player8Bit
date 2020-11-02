@@ -6,6 +6,7 @@
 
 enum SRV_MSG_ID 
   {
+     SRV_MSGID_NONE = 0,
      SRV_MSGID_ACCESA = 1,
      SRV_MSGID_APERTA,
      SRV_MSGID_CHIUSA,
@@ -48,7 +49,8 @@ struct server_work_data
      char          last_rx_data[SERVER_RX_LINE_SIZE];  // dati ultima riga dati ricevuta
      uint8_t       paydec_state;       // macchina a stati riconoscimento inizio paylaod
      BOOL          ena_header_print;
-     server_msg_id usr_msg_id;         // tipo di messaggio da inviare
+     server_msg_id usr_msg_id;         // id messaggio da inviare
+     uint8_t       usr_msg_type;       // tipo messaggio (solo invio/con risposta)
      BOOL          LAN_connection_OK;  // connessione LAN ok
      uint32_t      open_ms_start;      // timestamp inizio apertura connessione
      uint32_t      open_ms_end;        // timestamp fine apertura connessione  
