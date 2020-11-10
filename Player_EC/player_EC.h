@@ -97,7 +97,9 @@
 #elif MACHINE_TYPE == ARGO_LK
 #include "Application_Code/Specific_code/LK/Erog/appl_erog_LK.h"
 #elif MACHINE_TYPE == ARGO_GR
-#include "Application_Code/Erog/KD/appl_erog_GR.h"
+#include "Application_Code/Specific_code/GR/Erog/appl_erog_GR.h"
+#include "Application_Code/Specific_code/GR/GR_IO_mapping.h"
+#include "Application_Code/Specific_code/GR/Motor/appl_motor.h"
 #elif MACHINE_TYPE == ARGO_XL
 #include "Application_Code/Erog/KD/appl_erog_XL.h"
 #endif

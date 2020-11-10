@@ -96,6 +96,12 @@ void storage_hand(void)
                        case CMD_STORAGE_READ_ABIL:
                          FSM_storage.stat = ST_STORAGE_READ_ABIL;
                          break;
+                       case CMD_STORAGE_SAVE_OFFLINE:
+                         FSM_storage.stat = ST_STORAGE_WRITE_OFFLINE;
+                         break;
+                       case CMD_STORAGE_SAVE_TRANS:
+                         FSM_storage.stat = ST_STORAGE_WRITE_MV;
+                         break;
                     }
               } 
             break; 
@@ -178,6 +184,17 @@ void storage_hand(void)
               }*/
             break;
 
+          // Scrittura del file di log delle transazioni
+          case ST_STORAGE_WRITE_MV:
+            debug_print_FSM_storage(&FSM_storage,(char *)"ST_STORAGE_WRITE_MV");
+            break;
+
+          // Scrittura del file per la memorizzazione della transazione avvenuta offline
+          case ST_STORAGE_WRITE_OFFLINE:
+            debug_print_FSM_storage(&FSM_storage,(char *)"ST_STORAGE_WRITE_OFFLINE");
+            create_offline_file(FSM_storage.msg_data);
+            break;
+
           case ST_STORAGE_SOFT_ERR:
             break;
           
@@ -208,6 +225,7 @@ void storage_send_command(uint8_t command,uint8_t *data_addr,uint8_t data_size)
           case  CMD_STORAGE_READ_RICARICA:
           case  CMD_STORAGE_FIND_BADGE:
           case  CMD_STORAGE_READ_ABIL:
+          case  CMD_STORAGE_SAVE_TRANS:
             FSM_storage.command = command;
             // vedi se comando prevede parametri
             if (data_addr != NULL)
@@ -219,6 +237,17 @@ void storage_send_command(uint8_t command,uint8_t *data_addr,uint8_t data_size)
                    }  
               }
             break; 
+          
+          case  CMD_STORAGE_SAVE_OFFLINE:
+            if (data_addr != NULL)
+            {
+              if (data_size < sizeof(FSM_storage.msg_data))
+              {
+                memcpy(FSM_storage.msg_data, data_addr, data_size);
+              }
+            }
+            break;
+          
           default:
             break;
        }

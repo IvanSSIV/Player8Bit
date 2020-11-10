@@ -13,10 +13,22 @@ struct motor_status
 typedef struct motor_status MOT_STAT;
 
 #define MOT_EV_NONE	    0
-#define MOT_EV_START	    1
-#define MOT_EV_STOP	    2
-#define MOT_EV_INVALID      3  // evento non valido
-#define MOT_EV_HALTED       4  // motore bloccate
+#define MOT_EV_START_FWD    1
+#define MOT_EV_START_REV    2
+#define MOT_EV_STOP	    3
+#define MOT_EV_INVALID      4  // evento non valido
+#define MOT_EV_HALTED       5  // motore bloccate
+
+enum motor_state {
+  ST_MOT_INIT = 0,
+  ST_MOT_IDLE,
+  ST_MOT_STARTING_FWD,
+  ST_MOT_STARTING_REV,
+  ST_MOT_ON_FWD,
+  ST_MOT_ON_REV,
+  ST_MOT_ERR,
+  ST_MOT_BLOCC  
+};
 
 _EXTVAR uint8_t last_mot_event;		// Variabile per la gestione del funzionamento del motore con invio di eventi al suo gestore
 _EXTVAR uint32_t ritardo_taglio_motore;				// millisecondi dopo i quali la corrente del motore viene misurata

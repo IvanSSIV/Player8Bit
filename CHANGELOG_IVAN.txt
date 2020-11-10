@@ -9,3 +9,13 @@
 -Iniziata la stesura della funzione speciale per LK "anagcn", dove viene scaricata l'anagrafica dei badge abilitati sul distributore
  corredata da nome e cognome associati al badge
 -Iniziata la stesura del modulo "LK MAPPING" per la mappatura degli sportelli da server su Argo LK Pro
+
+09/11/2020-----------------------------------------------------------------------------------------------------------------------
+-Iniziata l'implementazione dei comandi nel gestore dell'erogazione per la scrittura dei file OFFLINE e del file MV di salvataggio
+ delle transazioni a bordo macchina
+-Iniziata la stesura delle API per la creazione dei file OFFLINE nella libreria Lanzi "Offline"
+
+10/11/2020-----------------------------------------------------------------------------------------------------------------------
+-Completata la stesura della "application_motor" per il GR, con eventi di avvio motore in entrambe le direzioni
+-Implementate a livello driver le API per invertire e ripristinare la direzione di rotazione del motore (gestione_motore_nodenti)
+-Iniziata l'implementazione dei comandi ESC per l'erogazione del GR

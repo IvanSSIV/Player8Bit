@@ -1,0 +1,1 @@
+void create_offline_file(char* msg);

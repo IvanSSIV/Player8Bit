@@ -64,6 +64,7 @@
 #include "./Config/config_API.h"
 
 // include in cartella "Offline"
+#include "./Offline/offline_API.h"
 
 // include in cartella "Server"
 #include "./Server/server_def.h"

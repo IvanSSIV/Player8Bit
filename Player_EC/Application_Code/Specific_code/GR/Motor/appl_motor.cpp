@@ -19,48 +19,32 @@ uint8_t sens_corrente = 0;					// pin A0, Digital46, PF0 per la lettura della co
 // Define mnemoniche per gestione della macchina a stati del motore
 FSM_WORK FSM_motor;
 
-#define ST_MOT_INIT       0
-#define ST_MOT_IDLE	      1
-#define ST_MOT_STARTING   2
-#define ST_MOT_ON	      3
-#define ST_MOT_ERR	      4
-#define ST_MOT_BLOCC      5
-/*
-static char* mot_state_name[] =
-{
-	"ST_MOT_INIT    ",
-	"ST_MOT_IDLE    ",
-	"ST_MOT_STARTING",
-	"ST_MOT_ON      ",
-	"ST_MOT_ERR     ",
-	"ST_MOT_BLOCC   "
-};
-*/
-
 static MOT_STAT motor_status;
 
 // Definizione delle stringhe su Program Memory per il debug su seriale
 
-const char str_mot_hand_init[] PROGMEM      = { "Handler degli eventi per il motore iniziato." };
-const char str_mot_hand_end[] PROGMEM       = { "Handler degli eventi per il motore terminato." };
-const char str_mot_init_start[] PROGMEM     = { "- Inizializzazione macchina a stati del motore -" };
-const char str_mot_init_end[] PROGMEM       = { "- Fine inizializzazione macchina a stati del motore -" };
-const char str_mot_send_event[] PROGMEM     = { "Motor send event : " };
-const char str_mot_ev_none[] PROGMEM        = { "MOT_EV_NONE" };
-const char str_mot_ev_start[] PROGMEM       = { "MOT_EV_START" };
-const char str_mot_ev_stop[] PROGMEM        = { "MOT_EV_STOP" };
-const char str_mot_ev_error[] PROGMEM       = { "MOT_EV_ERROR" };
-const char str_mot_nessun_evento[] PROGMEM  = { "Nessun evento inviato al motore" };
-const char str_mot_avvio_motore[] PROGMEM   = { "Inviato evento di avvio motore" };
-const char str_mot_arresto_motore[] PROGMEM = { "Inviato evento di arresto motore" };
-const char str_mot_errore_evento[] PROGMEM  = { "Errore di invio evento al motore!" };
-const char str_mot_bloccato[] PROGMEM       = { "Motore bloccato per sovracorrente!" };
-const char str_mot_st_init[] PROGMEM        = { "ST_MOT_INIT     " };
-const char str_mot_st_idle[] PROGMEM        = { "ST_MOT_IDLE     " };
-const char str_mot_st_starting[] PROGMEM    = { "ST_MOT_STARTING " };
-const char str_mot_st_on[] PROGMEM          = { "ST_MOT_ON       " };
-const char str_mot_st_err[] PROGMEM         = { "ST_MOT_ERR      " };
-const char str_mot_st_bloccato[] PROGMEM = { "ST_MOT_BLOCC    " };
+const char str_mot_hand_init[] PROGMEM          = { "Handler degli eventi per il motore iniziato." };
+const char str_mot_hand_end[] PROGMEM           = { "Handler degli eventi per il motore terminato." };
+const char str_mot_init_start[] PROGMEM         = { "- Inizializzazione macchina a stati del motore -" };
+const char str_mot_init_end[] PROGMEM           = { "- Fine inizializzazione macchina a stati del motore -" };
+const char str_mot_send_event[] PROGMEM         = { "Motor send event : " };
+const char str_mot_ev_none[] PROGMEM            = { "MOT_EV_NONE" };
+const char str_mot_ev_start_fwd[] PROGMEM       = { "MOT_EV_START_FWD" };
+const char str_mot_ev_start_rev[] PROGMEM       = { "MOT_EV_START_REV" };
+const char str_mot_ev_stop[] PROGMEM            = { "MOT_EV_STOP" };
+const char str_mot_ev_error[] PROGMEM           = { "MOT_EV_ERROR" };
+const char str_mot_nessun_evento[] PROGMEM      = { "Nessun evento inviato al motore" };
+const char str_mot_avvio_motore_FWD[] PROGMEM   = { "Inviato evento di avvio motore - FWD" };
+const char str_mot_avvio_motore_REV[] PROGMEM   = { "Inviato evento di avvio motore - REV" };
+const char str_mot_arresto_motore[] PROGMEM     = { "Inviato evento di arresto motore" };
+const char str_mot_errore_evento[] PROGMEM      = { "Errore di invio evento al motore!" };
+const char str_mot_bloccato[] PROGMEM           = { "Motore bloccato per sovracorrente!" };
+const char str_mot_st_init[] PROGMEM            = { "ST_MOT_INIT     " };
+const char str_mot_st_idle[] PROGMEM            = { "ST_MOT_IDLE     " };
+const char str_mot_st_starting[] PROGMEM        = { "ST_MOT_STARTING " };
+const char str_mot_st_on[] PROGMEM              = { "ST_MOT_ON       " };
+const char str_mot_st_err[] PROGMEM             = { "ST_MOT_ERR      " };
+const char str_mot_st_bloccato[] PROGMEM        = { "ST_MOT_BLOCC    " };
 
 // Vettore in program memory con i nomi degli stati
 const char* const mot_state_name[] PROGMEM = {
@@ -93,9 +77,12 @@ static char* mot_ev_to_str(uint8_t event)
 		case MOT_EV_NONE:
 			strncpy(buff, AVR_PGM_to_str(str_mot_ev_none), sizeof(buff) - 1);
 			break;
-		case MOT_EV_START:
-			strncpy(buff, AVR_PGM_to_str(str_mot_ev_start), sizeof(buff) - 1);
+		case MOT_EV_START_FWD:
+			strncpy(buff, AVR_PGM_to_str(str_mot_ev_start_fwd), sizeof(buff) - 1);
 			break;
+		case MOT_EV_START_REV:
+		        strncpy(buff, AVR_PGM_to_str(str_mot_ev_start_rev), sizeof(buff) - 1);
+		        break;
 		case MOT_EV_STOP:
 			strncpy(buff, AVR_PGM_to_str(str_mot_ev_stop), sizeof(buff) - 1);
 			break;
@@ -206,30 +193,40 @@ uint8_t motor_send_event(uint8_t event)
 		retval = event;
 		switch (event)
 		{
-		case MOT_EV_NONE:
-			#ifdef DEBUG_VERSION
-				debug_print_ena(mot_dbg, AVR_PGM_to_str(str_mot_nessun_evento));
-			#endif
-			break;
-		case MOT_EV_START:
-			#ifdef DEBUG_VERSION
-				debug_print_ena(mot_dbg, AVR_PGM_to_str(str_mot_avvio_motore));
-			#endif
-			//fsm_set_timer(&FSM_motor, FSM_TIMER1);
-			fsm_set_state(&FSM_motor, ST_MOT_STARTING);
-			break;
-		case MOT_EV_STOP:
-			#ifdef DEBUG_VERSION
-				debug_print_ena(mot_dbg, AVR_PGM_to_str(str_mot_arresto_motore));
-			#endif
-			fsm_set_state(&FSM_motor, ST_MOT_IDLE);
-			break;
-		default:
-			#ifdef DEBUG_VERSION
-				debug_print_ena(mot_dbg, AVR_PGM_to_str(str_mot_errore_evento));
-			#endif
-			retval = MOT_EV_INVALID;
-			fsm_set_state(&FSM_motor, ST_MOT_ERR);
+		  case MOT_EV_NONE:
+		  #ifdef DEBUG_VERSION
+			  debug_print_ena(mot_dbg, AVR_PGM_to_str(str_mot_nessun_evento));
+		  #endif
+		  break;
+		
+		  case MOT_EV_START_FWD:
+		  #ifdef DEBUG_VERSION
+			  debug_print_ena(mot_dbg, AVR_PGM_to_str(str_mot_avvio_motore_FWD));
+		  #endif
+		  //fsm_set_timer(&FSM_motor, FSM_TIMER1);
+		  fsm_set_state(&FSM_motor, ST_MOT_STARTING_FWD);
+		  break;
+
+		  case MOT_EV_START_REV:
+		  #ifdef DEBUG_VERSION
+		    debug_print_ena(mot_dbg, AVR_PGM_to_str(str_mot_avvio_motore_REV));
+		  #endif // DEBUG_VERSION
+		  fsm_set_state(&FSM_motor, ST_MOT_STARTING_REV);
+		  break;
+
+		  case MOT_EV_STOP:
+		  #ifdef DEBUG_VERSION
+			  debug_print_ena(mot_dbg, AVR_PGM_to_str(str_mot_arresto_motore));
+		  #endif
+		  fsm_set_state(&FSM_motor, ST_MOT_IDLE);
+		  break;
+
+		  default:
+		  #ifdef DEBUG_VERSION
+		  debug_print_ena(mot_dbg, AVR_PGM_to_str(str_mot_errore_evento));
+		  #endif
+		  retval = MOT_EV_INVALID;
+		  fsm_set_state(&FSM_motor, ST_MOT_ERR);
 		}
 	}
 	else
@@ -267,22 +264,52 @@ void motor_hand(void)
 		if (fsm_first_scan(&FSM_motor, AVR_PGM_to_str(str_mot_st_idle)))
 		{
 			motor_STOP(); // fermo il motore
+			motor_FWD();
 		}
 		break;
 
-	case ST_MOT_STARTING:
+	case ST_MOT_STARTING_FWD:
 		if (fsm_first_scan(&FSM_motor, AVR_PGM_to_str(str_mot_st_starting)))
 		{
+		        motor_FWD();
 			motor_START(); // avvio il motore
 			fsm_set_timer(&FSM_motor, FSM_TIMER1, ritardo_taglio_motore);
 		}
 		if (fsm_check_end_time(&FSM_motor, FSM_TIMER1))   // 300 ms di delay per attesa misurazione taglio corrente
 		{
-			fsm_set_state(&FSM_motor, ST_MOT_ON);
+			fsm_set_state(&FSM_motor, ST_MOT_ON_FWD);
 		}
 		break;
 
-	case ST_MOT_ON:
+	case ST_MOT_ON_FWD:
+		uint16_t current;
+		current = mot_current();
+		if (current > taglio_motore)
+		{
+			#ifdef DEBUG_VERSION
+				char buff[50];
+				sprintf(buff, "current=%04u  taglio_motore=%04u", current, taglio_motore);
+				debug_print_timestamp_title(mot_dbg, DEBUG_IDENT_L2, AVR_PGM_to_str(str_mot_bloccato), buff);
+			#endif
+			
+			fsm_set_state(&FSM_motor, ST_MOT_BLOCC);
+		}
+		break;
+
+		case ST_MOT_STARTING_REV:
+		if (fsm_first_scan(&FSM_motor, AVR_PGM_to_str(str_mot_st_starting)))
+		{
+		        motor_REV();
+			motor_START(); // avvio il motore
+			fsm_set_timer(&FSM_motor, FSM_TIMER1, ritardo_taglio_motore);
+		}
+		if (fsm_check_end_time(&FSM_motor, FSM_TIMER1))   // 300 ms di delay per attesa misurazione taglio corrente
+		{
+			fsm_set_state(&FSM_motor, ST_MOT_ON_FWD);
+		}
+		break;
+
+	case ST_MOT_ON_REV:
 		uint16_t current;
 		current = mot_current();
 		if (current > taglio_motore)
@@ -304,6 +331,7 @@ void motor_hand(void)
 		if (fsm_first_scan(&FSM_motor, AVR_PGM_to_str(str_mot_st_bloccato)))
 		{
 			motor_STOP();  // fermo il motore
+			motor_FWD();
 		}
 		break;
 

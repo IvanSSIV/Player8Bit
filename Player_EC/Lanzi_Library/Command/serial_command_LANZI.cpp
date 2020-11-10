@@ -1,5 +1,5 @@
 #include "..\Lanzi_library.h"
-#include "command_server.h"
+//#include "command_server.h"
 // prototipi funzione locali
 static BOOL serial_ESC_LANZI_anagrafica(char c,uint8_t *stat);
 static BOOL serial_ESC_LANZI_config(char c,uint8_t *stat);
