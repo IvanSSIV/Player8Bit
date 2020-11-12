@@ -13,6 +13,7 @@
 
 //#define APPLICATION_MODE_CLASSIC
 
+
 #define PLC_MAX_X  24
 #define PLC_MAX_Y  24
 
