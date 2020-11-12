@@ -38,6 +38,10 @@
 
 // include in cartella "Command"
 #include "./Command/serial_command_LANZI.h"
+#include "./Command/command_server.h"
+#include "./Command/command_config.h"
+#include "./Command/command_anagrafica.h"
+#include "./Command/command_badge.h"
 
 // include in cartella "Storage"
 #include "./Storage/storage_def.h"

@@ -8,7 +8,7 @@
 /*									    */
 /*									    */
 /****************************************************************************/
-#define MACHINE_TYPE ARGO_GR
+#define MACHINE_TYPE ARGO_EC
 
 
 //#define APPLICATION_MODE_CLASSIC

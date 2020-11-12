@@ -14,7 +14,7 @@
 // stringhe con "nome_apparato" e "versione_firmware" per
 // messaggio di boot su seriale di debug
 static const char str_nome_apparato[34] PROGMEM = { "\n*          Player-EC           *" };
-static const char str_versione_FW[34] PROGMEM   = { "\n*    V 0.90.23 (01-11-2020)    *" };
+static const char str_versione_FW[34] PROGMEM   = { "\n*    V 0.90.24 (11-11-2020)    *" };
 
 const char *get_nome_apparato(void)
   {

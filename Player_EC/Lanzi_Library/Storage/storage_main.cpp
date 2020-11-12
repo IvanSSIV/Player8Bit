@@ -192,7 +192,7 @@ void storage_hand(void)
           // Scrittura del file per la memorizzazione della transazione avvenuta offline
           case ST_STORAGE_WRITE_OFFLINE:
             debug_print_FSM_storage(&FSM_storage,(char *)"ST_STORAGE_WRITE_OFFLINE");
-            create_offline_file(FSM_storage.msg_data);
+            //create_offline_file(FSM_storage.msg_data);
             break;
 
           case ST_STORAGE_SOFT_ERR:

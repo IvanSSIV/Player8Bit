@@ -1,0 +1,36 @@
+
+             *-------------------------------------------------*
+             * comandi ESC per libreria LANZI v1.01 11-11-2020 *
+             *-------------------------------------------------*
+             
+  I comanndi LANZI permettono di testare singolarmente le principali funzioni 
+  della libreria LANZI . Sono costituiti da almeno 4 caratteri .
+  La sequenza inizia con <ESC>+L seguito da un carattere che identifica
+  sottoinsieme delle funzioni della libreria e precisamente .
+   - <ESC>LC comandi Config
+   - <ESC>LA comandi Anagrafica
+   - <ESC>LB comandi Badge
+   - <ESC>LS comandi Server
+   - <ESC>LO comandi Offline
+   - <ESC>LV comandi Virtual_server
+   - <ESC>LT comandi Transazioni 
+  Segue un carattere che specifica l'azione specifica da compiere
+
+
+  comandi <ESC>LC (Config)
+  ------------------------------
+   - <ESC>LC1 richiede il config dal server
+   - <ESC>LC2 legge il config su SD
+   - <ESC>LC2 legge il config da EEPROM
+
+   - <ESC>LC8 cancella il config da SD
+   - <ESC>LC9 cancella il config da EEPROM 
+  
+
+  comandi <ESC>LS (Server)
+  ------------------------
+   - <ESC>LS1 invia comando "ACCESA"
+   - <ESC>LS2 invia comando "APERTA"
+   - <ESC>LS3 invia comando "CHIUSA"
+   - <ESC>LS4 invia comando "PCTIME"
+

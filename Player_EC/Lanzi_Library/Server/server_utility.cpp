@@ -765,7 +765,9 @@ static void server_make_message(void)
           case SRV_MSGID_BADGE:
             serv_msg_start(str_badge);
             serv_strncat(usr_message_payload);
+            serv_strncat("_");
             serv_strncat(numero_PC);
+            serv_strncat(datetime);
             break;
             
           case SRV_MSGID_AUTORIZZO:

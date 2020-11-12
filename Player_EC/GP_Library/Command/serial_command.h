@@ -18,7 +18,8 @@ typedef enum ESC_hand_state ESC_HAND_STATE;
 
 
 void serial_ESC_command(void);
-BOOL serial_ESC_player(char c);
 //BOOL serial_ESC_LANZI(char c);
+BOOL serial_ESC_player(char c);
+
 BOOL serial_ESC_system(char c);
 #undef _EXTVAR

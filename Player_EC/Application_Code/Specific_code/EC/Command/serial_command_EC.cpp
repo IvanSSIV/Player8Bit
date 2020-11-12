@@ -4,14 +4,14 @@ const char str_command_erog_start[] PROGMEM = { "[ESC_CMD] start procedura eroga
 const char str_command_erog_stop[] PROGMEM  = { "[ESC_CMD] stop  procedura erogazione tappi" };
 
 // comandi ESC specifici per player EC
-// ESC+P1 = avvia erogazione
-// ESC+P2 = ferma erogazione
+// ESC+PEC1 = avvia erogazione
+// ESC+PEC2 = ferma erogazione
 
 BOOL serial_ESC_player(char c)
   {
-     /*char buff[80];
-     sprintf(buff,"ricevuto comando <ESC>P%c",c);
-     debug_print_timestamp(TRUE,buff);*/
+     char buff[80];
+     sprintf(buff,"ricevuto comando <ESC>PEC%c",c);
+     debug_message_timestamp(buff);
 
      switch (c)
        {
