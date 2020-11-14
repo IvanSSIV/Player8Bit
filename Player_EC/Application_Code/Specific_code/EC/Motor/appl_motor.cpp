@@ -13,6 +13,8 @@
 #define MODULE_APPL_MOTORE
 #include "player_EC.h"
 
+#if MACHINE_TYPE == ARGO_EC
+
 uint8_t sens_corrente = 0;					// pin A0, Digital46, PF0 per la lettura della corrente
 
 
@@ -311,5 +313,7 @@ void motor_hand(void)
 		;
 	}
 }
+
+#endif
 
 #undef MODULE_GEST_MOTORE_NODENTI

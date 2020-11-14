@@ -16,7 +16,7 @@ char* sdreadbuff;
 VM_DATA vm_data;
 
 // Prototipi funzione locale
-static void init_uso_memoria_RAM(void);
+//static void init_uso_memoria_RAM(void);
 
 const char appl_init_start[] PROGMEM = { "## inizio appl_init() ##" };
 const char appl_init_end[] PROGMEM   = { "## fine appl_init() ##" };
@@ -47,7 +47,7 @@ void appl_init(void)
      GPIO_init();
 
      // Inizializza ingressi ad alta velocità
-     hi_speed_init_LL();
+    // hi_speed_init_LL();
 
      // inzializza LCD
      LCD_init();
@@ -109,7 +109,7 @@ void appl_init(void)
   }
 
 
-
+/*
 static void init_uso_memoria_RAM(void) 
   {
      char buff[80];
@@ -120,3 +120,4 @@ static void init_uso_memoria_RAM(void)
      sprintf(buff, "Dimensione messaggi stato appl_erog %03u", erog_sizeof_state_message());
      debug_print_timestamp(DBG_ALWAYS_ON, buff);
   }
+  */

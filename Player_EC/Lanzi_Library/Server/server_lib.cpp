@@ -1,12 +1,12 @@
 /****************************************************************************/
 /* File: appl_server.cpp                                                    */
-/* Data creazione: 07/04/2020                                                              */
-/* Creato da: Ivan De Stefani                                                              */
-/* Funzione: Gestione ad alto livello della logica del server.                   */
-/*                                                                                               */
-/* Changelog:                                                                                */
-/*                                                                                               */
-/*                                                                                               */
+/* Data creazione: 07/04/2020                                               */
+/* Creato da: Ivan De Stefani                                               */
+/* Funzione: Gestione ad alto livello della logica del server.              */
+/*                                                                          */
+/* Changelog:                                                               */
+/*                                                                          */
+/*                                                                          */
 /****************************************************************************/
 #define MODULE_APPL_SERVER
 
@@ -75,6 +75,7 @@ const char str_srv_answ_BDG_OK[] PROGMEM       = { "RISP_BADGE_ABILITATO" };
 const char str_srv_answ_BDG_KO[] PROGMEM       = { "RISP_BADGE_NON_ABILIATO" };
 const char str_srv_answ_BDG_OOT[] PROGMEM      = { "RISP_BADGE_FUORI_ORARIO" };
 const char str_srv_answ_BDG_CEASED[] PROGMEM   = { "RISP_BADGE_CESSATO" };
+const char str_srv_answ_BDG_UNKN[] PROGMEM     = { "RISP_BADGE_SCONOSCIUTO" };
 //PIATTO_
 const char str_srv_answ_PRODUCT_NENA[] PROGMEM = { "RISP_PRODOTTO_NON_ABILITATO" };
 const char str_srv_answ_MAX_LIM[] PROGMEM      = { "RISP_LIMITE_MAX_RAGGIUNTO" };
@@ -91,7 +92,7 @@ BOOL server_open(void);
 void server_close(void);
 void server_transmit(void);
 BOOL server_invia_messaggio_senza_risposta(void);
-
+static BOOL check_badge_answer(char* vect);
 static void server_print_answer_code(server_answer_code code);
 static BOOL Server_check_answer(server_msg_id msg_id, char* server_answer);
 static server_answer_code Server_decode_answer(server_msg_id msg_id, char* server_answer);
@@ -634,6 +635,11 @@ static server_answer_code Server_decode_answer(server_msg_id msg_id, char* serve
             break; 
           
           case SRV_MSGID_BADGE:
+            if (check_badge_answer(server_answer))
+              retval = SRV_ANSW_OK;
+            else
+              retval = SRV_ANSW_DATA_ERR;
+            break;
             break; 
           
           case SRV_MSGID_AUTORIZZO:
@@ -695,6 +701,22 @@ FSM_RETVAL server_request_state(void)
        }
      return retval;
   }
+
+static BOOL check_badge_answer(char* vect)
+{
+  BOOL retval;
+  retval = FALSE;
+
+  if (strncmp(vect, AVR_PGM_to_str(str_srv_answ_BDG_CEASED), AVR_PGM_strlen(str_srv_answ_BDG_CEASED)) == 0 ||
+      strncmp(vect, AVR_PGM_to_str(str_srv_answ_BDG_OK), AVR_PGM_strlen(str_srv_answ_BDG_OK))         == 0 ||
+      strncmp(vect, AVR_PGM_to_str(str_srv_answ_BDG_KO), AVR_PGM_strlen(str_srv_answ_BDG_KO))         == 0 ||
+      strncmp(vect, AVR_PGM_to_str(str_srv_answ_BDG_OOT), AVR_PGM_strlen(str_srv_answ_BDG_OOT))       == 0 ||
+      strncmp(vect, AVR_PGM_to_str(str_srv_answ_BDG_UNKN), AVR_PGM_strlen(str_srv_answ_BDG_UNKN))     == 0 )
+  {
+    retval = TRUE;
+  }
+  return retval;
+}
 
 #undef MODULE_APPL_SERVER
 

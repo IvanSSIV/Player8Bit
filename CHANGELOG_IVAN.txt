@@ -19,3 +19,8 @@
 -Completata la stesura della "application_motor" per il GR, con eventi di avvio motore in entrambe le direzioni
 -Implementate a livello driver le API per invertire e ripristinare la direzione di rotazione del motore (gestione_motore_nodenti)
 -Iniziata l'implementazione dei comandi ESC per l'erogazione del GR
+
+12/11/2020-----------------------------------------------------------------------------------------------------------------------
+-Inserito blocco di preprocessore nelle appl_motor per gestione inclusioni dipendenti dal tipo di macchina per cui si compila
+-Aggiunto il carattere "_" nella server_lib in tutti i messaggi
+-Corretta la formattazzione dei messaggi per il server nella funzione "server_make_message()"

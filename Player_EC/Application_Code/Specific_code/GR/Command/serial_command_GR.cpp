@@ -5,7 +5,7 @@
 const char str_command_erog_start[] PROGMEM = { "[ESC_CMD] start procedura erogazione" };
 const char str_command_erog_stop[] PROGMEM  = { "[ESC_CMD] stop  procedura erogazione" };
 
-BOOL serial_ESC_player_GR(char c)
+BOOL serial_ESC_player(char c)
   {
      /*char buff[80];
      sprintf(buff,"ricevuto comando <ESC>P%c",c);

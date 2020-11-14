@@ -8,6 +8,7 @@
 /*																			*/
 /*																			*/
 /****************************************************************************/
+#include <SoftwareSerial.h>
 #include <Wire.h>
 #include <DS1307RTC.h>
 #include <LiquidCrystal.h>
@@ -19,6 +20,7 @@
 #include <Ethernet.h>
 #include <utility/w5100.h>
 #include <EEPROM.h>
+
 
 extern void appl_init(void);
 extern void appl_main(void);

@@ -1,3 +1,10 @@
+
+#ifdef MODULE_APPL_EROG
+#define _EXTVAR /**/
+#else
+#define _EXTVAR extern
+#endif
+
 enum gr_erog_state {
   ST_EROG_IDLE = 0,
   ST_EROG_APRI_SPORTELLO,
@@ -20,3 +27,5 @@ BOOL erog_is_error(void);
 void erog_reset_error();
 void erog_init(void);
 void erog_hand(void);
+
+#undef _EXTVAR

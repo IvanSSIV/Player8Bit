@@ -704,100 +704,117 @@ static void server_make_message(void)
      switch (server_work.usr_msg_id)
        {
           case SRV_MSGID_ACCESA:
-            serv_msg_start(str_accesa);
-            serv_strncat(numero_PC);
-            serv_strncat(versione_FW);
-            serv_strncat(datetime);
+            serv_msg_start(str_accesa);          // ACCESA_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(versione_FW);           // 0.90.09
+            serv_strncat(datetime);              // KF4187652
             break;
             
           case SRV_MSGID_APERTA:
-            serv_msg_start(str_aperta);
-            serv_strncat(numero_PC);
-            serv_strncat(datetime);
+            serv_msg_start(str_aperta);          // APERTA_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(datetime);              // KF4187652
             break;
 
           case SRV_MSGID_CHIUSA:
-            serv_msg_start(str_chiusa);
-            serv_strncat(numero_PC);
-            serv_strncat(datetime);
+            serv_msg_start(str_chiusa);          // CHIUSA_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(datetime);              // KF4187652
             break;
           
           case SRV_MSGID_ANAG:
-            serv_msg_start(str_rich_anag);
-            serv_strncat(numero_PC);
-            serv_strncat(datetime);
+            serv_msg_start(str_rich_anag);       // RICHIESTA_ANAG_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(datetime);              // KF4187652
             break;
                 
           case SRV_MSGID_RICHIESTA_CONFIG:
-            serv_msg_start(str_rich_config);
-            serv_strncat(numero_PC);
-            serv_strncat(datetime);
+            serv_msg_start(str_rich_config);     // RICHIESTA_CONFIG:
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(datetime);              // KF4187652
             break;
           
           case SRV_MSGID_PCTIME:
-            serv_msg_start(str_rich_pctime);
-            serv_strncat(numero_PC);
-            serv_strncat(datetime);
+            serv_msg_start(str_rich_pctime);     // RICHIESTA_PCtime_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(datetime);              // KF4187652
             break;
           
           case SRV_MSGID_CHECK_CFG:
-            serv_msg_start(str_check_config);
-            serv_strncat(numero_PC);
-            serv_strncat(datetime);
+            serv_msg_start(str_check_config);    // CHECK_CONFIG_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(datetime);              // KF4187652
             break;
             
           case SRV_MSGID_RELOAD:
-            serv_msg_start(str_reload);
-            serv_strncat(numero_PC);
+            serv_msg_start(str_reload);          // RELOAD_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(usr_message_payload);   // sector_slot
+            serv_strncat("_");                   // _
+            serv_strncat(datetime);              // KF4187652
             break;
           
           case SRV_MSGID_REFILL:
-            serv_msg_start(str_refill);
-            serv_strncat(numero_PC);
+            serv_msg_start(str_refill);          // REFILL_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(usr_message_payload);   // 01100110011001  (ogni numero è il settore corrispondente; 0: non caricato, 1: caricato)
+            serv_strncat("_");                   // _
+            serv_strncat(datetime);              // KF4187652
             break;
           
           case SRV_MSGID_RICARICATO:
-            serv_msg_start(str_ricaricato);
-            serv_strncat(numero_PC);
-            serv_strncat(datetime);
+            serv_msg_start(str_ricaricato);      // RICARICATO_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(datetime);              // KF4187652
             break;
           
-          case SRV_MSGID_BADGE:
-            serv_msg_start(str_badge);
-            serv_strncat(usr_message_payload);
-            serv_strncat("_");
-            serv_strncat(numero_PC);
-            serv_strncat(datetime);
+          case SRV_MSGID_BADGE:                  
+            serv_msg_start(str_badge);           // BADGE_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(usr_message_payload);   // badgenum
+            serv_strncat("_");                   // _
+            serv_strncat(datetime);              // KF4187652
             break;
             
-          case SRV_MSGID_AUTORIZZO:
-            serv_msg_start(str_autorizzo);
-            serv_strncat(usr_message_payload);
-            serv_strncat(numero_PC);
+          case SRV_MSGID_AUTORIZZO:              
+            serv_msg_start(str_autorizzo);       // AUTORIZZO_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(usr_message_payload);   // badgeauth_badge
+            serv_strncat("_");                   // _
+            serv_strncat(datetime);              //  KF4187652
             break;
             
           case SRV_MSGID_TRANSAZIONE:
-            serv_msg_start(str_transazione);
-            serv_strncat(usr_message_payload);
-            serv_strncat(numero_PC);
+            serv_msg_start(str_transazione);     // TRANSAZIONE_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(usr_message_payload);   // badge_sett_cella_esito
+            serv_strncat("_");                   // _
+            serv_strncat(datetime);              // KF4187652
             break;
             
-          case SRV_MSGID_PIATTO:
-            serv_msg_start(str_piatto);
-            serv_strncat(usr_message_payload);
-            serv_strncat(numero_PC);
+          case SRV_MSGID_PIATTO: 
+            serv_msg_start(str_piatto);          // PIATTO_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(usr_message_payload);   // badge_sett_cella
+            serv_strncat("_");                   // _
+            serv_strncat(datetime);              // KF4187652
             break;
             
           case SRV_MSGID_RESO:
-            serv_msg_start(str_reso);
-            serv_strncat(usr_message_payload);
-            serv_strncat(numero_PC);
+            serv_msg_start(str_reso);            // RESO_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(usr_message_payload);   // badge_sett_cella
+            serv_strncat("_");                   // _
+            serv_strncat(datetime);              // KF4187652
+            
             break;
           
           case SRV_MSGID_ANNULLATO:
-            serv_msg_start(str_annullato);
-            serv_strncat(usr_message_payload);
-            serv_strncat(numero_PC);
+            serv_msg_start(str_annullato);       // ANNULLATO_
+            serv_strncat(numero_PC);             // 20200
+            serv_strncat(usr_message_payload);   // badge_sett_cella
+            serv_strncat("_");                   // _
+            serv_strncat(datetime);              // KF4187652
             break;
           
           default:

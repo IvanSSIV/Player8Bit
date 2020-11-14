@@ -41,8 +41,9 @@ void appl_main(void)
      // vedi se basetempi a 10ms
      if (flg_bt_10ms)
        {
-          // gestione PLC + logica
-          // appl_test_PLC_main();
+          // gestione lettura ingressi
+          PLC_read_input(&PLC_IO_data);
+
           logic_main();
           
           // Gestione motore ad alto livello
@@ -54,6 +55,9 @@ void appl_main(void)
           // Gestione erogazione ad alto livello
           erog_hand();
              
+          // gestione attivazione uscite
+          PLC_write_output(&PLC_IO_data);
+
           if (print_request == 1)
               print_request = 2;
        }
